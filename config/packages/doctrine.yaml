@@ -2,7 +2,6 @@ doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
         types:
-            uuid: Ramsey\Uuid\Doctrine\UuidBinaryType
             point: CrEOF\Spatial\DBAL\Types\Geometry\PointType
             geometry: CrEOF\Spatial\DBAL\Types\GeometryType
 
