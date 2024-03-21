@@ -55,7 +55,7 @@ class Users
     #[ORM\Column(type: Types::ARRAY)]
     private array $role = [];
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

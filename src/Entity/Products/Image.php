@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Entity\Orders;
+namespace App\Entity\Products;
 
-use App\Repository\Orders\OrdersRepository;
+use App\Repository\Products\ImageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: OrdersRepository::class)]
-#[ORM\Table(name: 'order', schema: 'db_orders')]
-
-class Orders
+#[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ORM\Table(name: 'image', schema: 'db_products')]
+class Image
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -19,14 +18,14 @@ class Orders
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $id = null;
 
-    #[ORM\Column]
-    private ?int $status = null;
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $path = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $payed_at = null;
+    #[ORM\Column(length: 100)]
+    private ?string $name = null;
 
-    #[ORM\Column]
-    private ?float $total = null;
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $alternativ_text = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
@@ -39,38 +38,38 @@ class Orders
         return $this->id;
     }
 
-    public function getStatus(): ?int
+    public function getPath(): ?string
     {
-        return $this->status;
+        return $this->path;
     }
 
-    public function setStatus(int $status): static
+    public function setPath(string $path): static
     {
-        $this->status = $status;
+        $this->path = $path;
 
         return $this;
     }
 
-    public function getPayedAt(): ?\DateTimeInterface
+    public function getName(): ?string
     {
-        return $this->payed_at;
+        return $this->name;
     }
 
-    public function setPayedAt(\DateTimeInterface $payed_at): static
+    public function setName(string $name): static
     {
-        $this->payed_at = $payed_at;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getTotal(): ?float
+    public function getAlternativText(): ?string
     {
-        return $this->total;
+        return $this->alternativ_text;
     }
 
-    public function setTotal(float $total): static
+    public function setAlternativText(string $alternativ_text): static
     {
-        $this->total = $total;
+        $this->alternativ_text = $alternativ_text;
 
         return $this;
     }

@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: OrderPricingSellerOrErpRepository::class)]
+#[ORM\Table(name: 'orderPricingSellerOrErp', schema: 'db_orders')]
 class OrderPricingSellerOrErp
 {
     #[ORM\Id]
@@ -19,7 +20,7 @@ class OrderPricingSellerOrErp
     #[ORM\Column]
     private ?int $quantity = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

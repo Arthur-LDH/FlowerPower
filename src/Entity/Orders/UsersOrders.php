@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UsersOrdersRepository::class)]
+#[ORM\Table(name: 'usersOrders', schema: 'db_orders')]
 class UsersOrders
 {
     #[ORM\Id]
@@ -29,7 +30,7 @@ class UsersOrders
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
