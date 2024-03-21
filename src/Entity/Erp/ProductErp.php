@@ -3,6 +3,7 @@
 namespace App\Entity\Erp;
 
 use App\Repository\Erp\ProductErpRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -10,6 +11,7 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: ProductErpRepository::class)]
 #[ORM\Table(name: 'productErp', schema: 'db_erp')]
+#[ORM\HasLifecycleCallbacks]
 class ProductErp
 {
     #[ORM\Id]
@@ -35,6 +37,24 @@ class ProductErp
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    public function __construct()
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        if ($this->getCreatedAt() == null) {
+            $this->setCreatedAt(new DateTimeImmutable());
+        }
+    }
+
+    /**
+     * Gets triggered every time on update
+     */
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): static
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        return $this;
+    }
 
     public function getId(): ?Uuid
     {

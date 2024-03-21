@@ -3,16 +3,21 @@
 namespace App\Entity\Erp;
 
 use App\Repository\Erp\PricingErpRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: PricingErpRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class PricingErp
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $id = null;
 
     #[ORM\Column(length: 100)]
     private ?string $name = null;
@@ -35,7 +40,25 @@ class PricingErp
     #[ORM\Column]
     private ?int $stock_min = null;
 
-    public function getId(): ?int
+    public function __construct()
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        if ($this->getCreatedAt() == null) {
+            $this->setCreatedAt(new DateTimeImmutable());
+        }
+    }
+
+    /**
+     * Gets triggered every time on update
+     */
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): static
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        return $this;
+    }
+
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

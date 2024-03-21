@@ -3,6 +3,7 @@
 namespace App\Entity\Users;
 
 use App\Repository\Users\UsersRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -54,6 +55,24 @@ class Users
 
     #[ORM\Column(type: Types::ARRAY)]
     private array $role = [];
+
+    public function __construct()
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        if ($this->getCreatedAt() == null) {
+            $this->setCreatedAt(new DateTimeImmutable());
+        }
+    }
+
+    /**
+     * Gets triggered every time on update
+     */
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): static
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        return $this;
+    }
 
     public function getId(): ?Uuid
     {

@@ -3,6 +3,7 @@
 namespace App\Entity\Products;
 
 use App\Repository\Products\pricingSellerRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -10,6 +11,7 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: pricingSellerRepository::class)]
 #[ORM\Table(name: 'pricingSeller', schema: 'db_products')]
+#[ORM\HasLifecycleCallbacks]
 class PricingSeller
 {
     #[ORM\Id]
@@ -38,6 +40,24 @@ class PricingSeller
 
     #[ORM\Column]
     private ?int $stock_min = null;
+
+    public function __construct()
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        if ($this->getCreatedAt() == null) {
+            $this->setCreatedAt(new DateTimeImmutable());
+        }
+    }
+
+    /**
+     * Gets triggered every time on update
+     */
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): static
+    {
+        $this->setUpdatedAt(new DateTimeImmutable());
+        return $this;
+    }
 
     public function getId(): ?Uuid
     {
