@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: PricingErpRepository::class)]
+#[ORM\Table(name: 'pricingErp', schema: 'db_erp')]
 #[ORM\HasLifecycleCallbacks]
 class PricingErp
 {
