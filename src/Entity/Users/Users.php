@@ -5,20 +5,19 @@ namespace App\Entity\Users;
 use App\Repository\Users\UsersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
-#[ORM\Table(name: 'users', schema: 'db-users')]
+#[ORM\Table(name: 'users', schema: 'db_users')]
 
 class Users
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $uid = null;
+    private ?Uuid $id = null;
 
     #[ORM\Column(length: 50)]
     private ?string $firstname = null;
@@ -61,17 +60,6 @@ class Users
         return $this->id;
     }
 
-    public function getUid(): ?Uuid
-    {
-        return $this->uid;
-    }
-
-    public function setUid(Uuid $uid): static
-    {
-        $this->uid = $uid;
-
-        return $this;
-    }
 
     public function getFirstname(): ?string
     {

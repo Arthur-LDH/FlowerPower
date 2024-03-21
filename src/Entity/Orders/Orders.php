@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Entity\Users;
+namespace App\Entity\Orders;
 
-use App\Repository\Users\AddressRepository;
+use App\Repository\Orders\OrdersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: AddressRepository::class)]
-#[ORM\Table(name: 'address', schema: 'db_users')]
-class Address
+#[ORM\Entity(repositoryClass: OrdersRepository::class)]
+class Orders
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -18,9 +17,14 @@ class Address
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $id = null;
 
+    #[ORM\Column]
+    private ?int $status = null;
 
-    #[ORM\Column(type: 'point')]
-    private $coordinates;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $payed_at = null;
+
+    #[ORM\Column]
+    private ?float $total = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
@@ -33,15 +37,38 @@ class Address
         return $this->id;
     }
 
-
-    public function getCoordinates()
+    public function getStatus(): ?int
     {
-        return $this->coordinates;
+        return $this->status;
     }
 
-    public function setCoordinates($coordinates): static
+    public function setStatus(int $status): static
     {
-        $this->coordinates = $coordinates;
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPayedAt(): ?\DateTimeInterface
+    {
+        return $this->payed_at;
+    }
+
+    public function setPayedAt(\DateTimeInterface $payed_at): static
+    {
+        $this->payed_at = $payed_at;
+
+        return $this;
+    }
+
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    public function setTotal(float $total): static
+    {
+        $this->total = $total;
 
         return $this;
     }

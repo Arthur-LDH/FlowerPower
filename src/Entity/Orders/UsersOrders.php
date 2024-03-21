@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Entity\Users;
+namespace App\Entity\Orders;
 
-use App\Repository\Users\AddressRepository;
+use App\Repository\Orders\UsersOrdersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: AddressRepository::class)]
-#[ORM\Table(name: 'address', schema: 'db_users')]
-class Address
+#[ORM\Entity(repositoryClass: UsersOrdersRepository::class)]
+class UsersOrders
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -18,9 +17,11 @@ class Address
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $id = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $payment_intent = null;
 
-    #[ORM\Column(type: 'point')]
-    private $coordinates;
+    #[ORM\Column]
+    private ?float $amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
@@ -33,15 +34,26 @@ class Address
         return $this->id;
     }
 
-
-    public function getCoordinates()
+    public function getPaymentIntent(): ?string
     {
-        return $this->coordinates;
+        return $this->payment_intent;
     }
 
-    public function setCoordinates($coordinates): static
+    public function setPaymentIntent(string $payment_intent): static
     {
-        $this->coordinates = $coordinates;
+        $this->payment_intent = $payment_intent;
+
+        return $this;
+    }
+
+    public function getAmount(): ?float
+    {
+        return $this->amount;
+    }
+
+    public function setAmount(float $amount): static
+    {
+        $this->amount = $amount;
 
         return $this;
     }

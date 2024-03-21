@@ -5,19 +5,18 @@ namespace App\Entity\Users;
 use App\Repository\Users\SellerRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: SellerRepository::class)]
-#[ORM\Table(name: 'seller', schema: 'db-users')]
+#[ORM\Table(name: 'seller', schema: 'db_users')]
 class Seller
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $uid = null;
+    private ?Uuid $id = null;
 
     #[ORM\Column(length: 50)]
     private ?string $national_code = null;
@@ -43,18 +42,6 @@ class Seller
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUid(): ?Uuid
-    {
-        return $this->uid;
-    }
-
-    public function setUid(Uuid $uid): static
-    {
-        $this->uid = $uid;
-
-        return $this;
     }
 
     public function getNationalCode(): ?string

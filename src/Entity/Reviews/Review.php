@@ -5,18 +5,19 @@ namespace App\Entity\Reviews;
 use App\Repository\Reviews\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
+#[ORM\Table(name: 'review', schema: 'db_reviews')]
 class Review
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $uid = null;
+    private ?Uuid $id = null;
+
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -30,22 +31,11 @@ class Review
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function getUid(): ?Uuid
-    {
-        return $this->uid;
-    }
-
-    public function setUid(Uuid $uid): static
-    {
-        $this->uid = $uid;
-
-        return $this;
-    }
 
     public function getComment(): ?string
     {
