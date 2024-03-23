@@ -52,7 +52,7 @@ services:
     ports:
       - "5432:5432"
 
-  redis:
+  database-basket:
     image: redis
     restart: unless-stopped
     ports:
