@@ -1,3 +1,4 @@
+version: '3'
 services:
   php:
     image: ${IMAGES_PREFIX:-}app-php
@@ -38,7 +39,7 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
-        
+  
   database-users:
     image: postgres:latest
     restart: unless-stopped
@@ -51,6 +52,12 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+  
   database-orders:
     image: postgres:latest
     restart: unless-stopped
