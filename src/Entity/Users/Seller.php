@@ -2,10 +2,14 @@
 
 namespace App\Entity\Users;
 
+use App\Entity\Erp\InvoiceErp;
+use App\Entity\Products\ProductSeller;
 use App\Repository\Users\SellerRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -39,6 +43,14 @@ class Seller
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'sellers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Users $users = null;
+
+    #[ORM\ManyToOne(inversedBy: 'sellers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Address $address = null;
 
     public function __construct()
     {
@@ -145,5 +157,43 @@ class Seller
         $this->updated_at = $updated_at;
 
         return $this;
+    }
+
+    public function getUsers(): ?Users
+    {
+        return $this->users;
+    }
+
+    public function setUsers(?Users $users): static
+    {
+        $this->users = $users;
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?Address $address): static
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getProducts(): ArrayCollection
+    {
+        $entityManager = ManagerRegistry::class->getManager('products');
+        $productsSellerRepository = $entityManager->getRepository(ProductSeller::class);
+        return $productsSellerRepository->findBy(['seller' => $this->id]);
+    }
+
+    public function getInvoices(): ArrayCollection
+    {
+        $entityManager = ManagerRegistry::class->getManager('erp');
+        $invoiceErpRepository = $entityManager->getRepository(InvoiceErp::class);
+        return $invoiceErpRepository->findBy(['seller' => $this->id]);
     }
 }

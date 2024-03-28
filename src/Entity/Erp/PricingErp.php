@@ -41,6 +41,10 @@ class PricingErp
     #[ORM\Column]
     private ?int $stock_min = null;
 
+    #[ORM\ManyToOne(inversedBy: 'pricingErps')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ProductErp $productErp = null;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -144,6 +148,18 @@ class PricingErp
     public function setStockMin(int $stock_min): static
     {
         $this->stock_min = $stock_min;
+
+        return $this;
+    }
+
+    public function getProductErp(): ?ProductErp
+    {
+        return $this->productErp;
+    }
+
+    public function setProductErp(?ProductErp $productErp): static
+    {
+        $this->productErp = $productErp;
 
         return $this;
     }

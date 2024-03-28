@@ -1,28 +1,28 @@
 <?php
 
-namespace App\Repository\Products;
+namespace App\Repository\Promotions;
 
-use App\Entity\Products\ProductBaseImage;
+use App\Entity\Promotions\PromotionProductSellerOrErp;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ProductBaseImage>
+ * @extends ServiceEntityRepository<PromotionProductSellerOrErp>
  *
- * @method ProductBaseImage|null find($id, $lockMode = null, $lockVersion = null)
- * @method ProductBaseImage|null findOneBy(array $criteria, array $orderBy = null)
- * @method ProductBaseImage[]    findAll()
- * @method ProductBaseImage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method PromotionProductSellerOrErp|null find($id, $lockMode = null, $lockVersion = null)
+ * @method PromotionProductSellerOrErp|null findOneBy(array $criteria, array $orderBy = null)
+ * @method PromotionProductSellerOrErp[]    findAll()
+ * @method PromotionProductSellerOrErp[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ProductBaseImageRepository extends ServiceEntityRepository
+class PromotionProductSellerOrErpRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ProductBaseImage::class);
+        parent::__construct($registry, PromotionProductSellerOrErp::class);
     }
 
     //    /**
-    //     * @return ProductBaseImage[] Returns an array of ProductBaseImage objects
+    //     * @return PromotionProductSellerOrErp[] Returns an array of PromotionProductSellerOrErp objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -36,7 +36,7 @@ class ProductBaseImageRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?ProductBaseImage
+    //    public function findOneBySomeField($value): ?PromotionProductSellerOrErp
     //    {
     //        return $this->createQueryBuilder('p')
     //            ->andWhere('p.exampleField = :val')

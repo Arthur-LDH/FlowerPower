@@ -2,10 +2,15 @@
 
 namespace App\Entity\Users;
 
+use App\Entity\Orders\UsersOrders;
+use App\Entity\Reviews\Review;
 use App\Repository\Users\UsersRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -56,12 +61,21 @@ class Users
     #[ORM\Column(type: Types::ARRAY)]
     private array $role = [];
 
+    #[ORM\OneToMany(targetEntity: UsersAddress::class, mappedBy: 'users', orphanRemoval: true)]
+    private Collection $usersAddresses;
+
+    #[ORM\OneToMany(targetEntity: Seller::class, mappedBy: 'users')]
+    private Collection $sellers;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
         if ($this->getCreatedAt() == null) {
             $this->setCreatedAt(new DateTimeImmutable());
         }
+        $this->usersAddresses = new ArrayCollection();
+        $this->sellers = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     /**
@@ -222,5 +236,79 @@ class Users
         $this->role = $role;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, UsersAddress>
+     */
+    public function getUsersAddresses(): Collection
+    {
+        return $this->usersAddresses;
+    }
+
+    public function addUsersAddress(UsersAddress $usersAddress): static
+    {
+        if (!$this->usersAddresses->contains($usersAddress)) {
+            $this->usersAddresses->add($usersAddress);
+            $usersAddress->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUsersAddress(UsersAddress $usersAddress): static
+    {
+        if ($this->usersAddresses->removeElement($usersAddress)) {
+            // set the owning side to null (unless already changed)
+            if ($usersAddress->getUsers() === $this) {
+                $usersAddress->setUsers(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Seller>
+     */
+    public function getSellers(): Collection
+    {
+        return $this->sellers;
+    }
+
+    public function addSeller(Seller $seller): static
+    {
+        if (!$this->sellers->contains($seller)) {
+            $this->sellers->add($seller);
+            $seller->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSeller(Seller $seller): static
+    {
+        if ($this->sellers->removeElement($seller)) {
+            // set the owning side to null (unless already changed)
+            if ($seller->getUsers() === $this) {
+                $seller->setUsers(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getReviews(): ArrayCollection
+    {
+        $entityManager = ManagerRegistry::class->getManager('reviews');
+        $reviewRepository = $entityManager->getRepository(Review::class);
+        return $reviewRepository->findBy(['user' => $this->id]);
+    }
+
+    public function getUserOrders(): ArrayCollection
+    {
+        $entityManager = ManagerRegistry::class->getManager('orders');
+        $userOrderRepository = $entityManager->getRepository(UsersOrders::class);
+        return $userOrderRepository->findBy(['user' => $this->id]);
     }
 }
