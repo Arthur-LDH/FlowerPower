@@ -8,5 +8,5 @@
 
 ## Migrations
 
-1. To create a migration, run : `php bin/console doctrine:migrations:diff --em:orders --namespace=DoctrineMigrationsOrders`, the -em:`name` is used to specified which entities through the entity manager you wish to migrate to the database. The --namespace=DoctrineMigrations`Orders` is used to specified wich repository you want to save your migration, for each database you have a specific file. The Entities Managers are defined in the the file config/packages/doctrine.yaml, about the namespace it's in the file config/packages/doctrine_migrations.yaml
+1. To create a migration, run : `php bin/console doctrine:migrations:diff --em:orders --namespace=DoctrineMigrationsOrders`, the -em:`name` is used to specified which entities through the entity manager you wish to migrate to the database. The --namespace=DoctrineMigrations`Orders` is used to specified wich repository you want to save your migration, for each database you have a specific repository. The Entities Managers are defined in the the file config/packages/doctrine.yaml, about the namespace it's in the file config/packages/doctrine_migrations.yaml
 2. To execute your migration, run : `php bin/console doctrine:migrations:migrate --em:orders --namespace=DoctrineMigrationsOrders`
