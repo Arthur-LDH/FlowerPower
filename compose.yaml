@@ -111,6 +111,12 @@ services:
     ports:
       - "5437:5432"
 
+  database-basket:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
