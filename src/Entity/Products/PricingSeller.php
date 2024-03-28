@@ -2,10 +2,13 @@
 
 namespace App\Entity\Products;
 
+use App\Entity\Orders\OrderPricingSellerOrErp;
 use App\Repository\Products\pricingSellerRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -40,6 +43,10 @@ class PricingSeller
 
     #[ORM\Column]
     private ?int $stock_min = null;
+
+    #[ORM\ManyToOne(inversedBy: 'pricingSellers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ProductSeller $productSeller = null;
 
     public function __construct()
     {
@@ -144,6 +151,18 @@ class PricingSeller
     public function setStockMin(int $stock_min): static
     {
         $this->stock_min = $stock_min;
+
+        return $this;
+    }
+
+    public function getProductSeller(): ?ProductSeller
+    {
+        return $this->productSeller;
+    }
+
+    public function setProductSeller(?ProductSeller $productSeller): static
+    {
+        $this->productSeller = $productSeller;
 
         return $this;
     }

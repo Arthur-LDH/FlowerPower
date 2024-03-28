@@ -4,6 +4,8 @@ namespace App\Entity\Products;
 
 use App\Repository\Products\ImageRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -35,12 +37,16 @@ class Image
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
+    #[ORM\OneToMany(targetEntity: ProductSellerImage::class, mappedBy: 'images')]
+    private Collection $productSellerImages;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
         if ($this->getCreatedAt() == null) {
             $this->setCreatedAt(new DateTimeImmutable());
         }
+        $this->productSellerImages = new ArrayCollection();
     }
 
     /**
@@ -114,6 +120,36 @@ class Image
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductSellerImage>
+     */
+    public function getProductSellerImages(): Collection
+    {
+        return $this->productSellerImages;
+    }
+
+    public function addProductSellerImage(ProductSellerImage $productSellerImage): static
+    {
+        if (!$this->productSellerImages->contains($productSellerImage)) {
+            $this->productSellerImages->add($productSellerImage);
+            $productSellerImage->setImages($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductSellerImage(ProductSellerImage $productSellerImage): static
+    {
+        if ($this->productSellerImages->removeElement($productSellerImage)) {
+            // set the owning side to null (unless already changed)
+            if ($productSellerImage->getImages() === $this) {
+                $productSellerImage->setImages(null);
+            }
+        }
 
         return $this;
     }

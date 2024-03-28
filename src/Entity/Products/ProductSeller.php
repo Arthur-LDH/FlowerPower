@@ -2,10 +2,17 @@
 
 namespace App\Entity\Products;
 
+use App\Entity\Promotions\PromotionProductSellerOrErp;
+use App\Entity\Reviews\Review;
+use App\Entity\Users\Seller;
+use App\Entity\Users\Users;
 use App\Repository\Products\ProductSellerRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -38,12 +45,27 @@ class ProductSeller
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
+    #[ORM\OneToMany(targetEntity: ProductSellerImage::class, mappedBy: 'products')]
+    private Collection $productSellerImages;
+
+    #[ORM\OneToMany(targetEntity: PricingSeller::class, mappedBy: 'productSeller', orphanRemoval: true)]
+    private Collection $pricingSellers;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $seller = null;
+
+    #[ORM\OneToMany(targetEntity: CategoryErpProductSeller::class, mappedBy: 'productSeller')]
+    private Collection $categoryErpProductSeller;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
         if ($this->getCreatedAt() == null) {
             $this->setCreatedAt(new DateTimeImmutable());
         }
+        $this->productSellerImages = new ArrayCollection();
+        $this->pricingSellers = new ArrayCollection();
+        $this->categoryErpProductSeller = new ArrayCollection();
     }
 
     /**
@@ -131,5 +153,140 @@ class ProductSeller
         $this->updated_at = $updated_at;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductSellerImage>
+     */
+    public function getProductSellerImages(): Collection
+    {
+        return $this->productSellerImages;
+    }
+
+    public function addProductSellerImage(ProductSellerImage $productSellerImage): static
+    {
+        if (!$this->productSellerImages->contains($productSellerImage)) {
+            $this->productSellerImages->add($productSellerImage);
+            $productSellerImage->setProducts($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductSellerImage(ProductSellerImage $productSellerImage): static
+    {
+        if ($this->productSellerImages->removeElement($productSellerImage)) {
+            // set the owning side to null (unless already changed)
+            if ($productSellerImage->getProducts() === $this) {
+                $productSellerImage->setProducts(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getReviews(): ArrayCollection
+    {
+        $entityManager = ManagerRegistry::class->getManager('reviews');
+        $reviewRepository = $entityManager->getRepository(Review::class);
+        return $reviewRepository->findBy(['user' => $this->id]);
+    }
+
+    /**
+     * @return Collection<int, PricingSeller>
+     */
+    public function getPricingSellers(): Collection
+    {
+        return $this->pricingSellers;
+    }
+
+    public function addPricingSeller(PricingSeller $pricingSeller): static
+    {
+        if (!$this->pricingSellers->contains($pricingSeller)) {
+            $this->pricingSellers->add($pricingSeller);
+            $pricingSeller->setProductSeller($this);
+        }
+
+        return $this;
+    }
+
+    public function removePricingSeller(PricingSeller $pricingSeller): static
+    {
+        if ($this->pricingSellers->removeElement($pricingSeller)) {
+            // set the owning side to null (unless already changed)
+            if ($pricingSeller->getProductSeller() === $this) {
+                $pricingSeller->setProductSeller(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSeller(): ?Seller
+    {
+        $entityManager = ManagerRegistry::class->getManager('default');
+        $sellerRepository = $entityManager->getRepository(Seller::class);
+        return $sellerRepository->find($this->seller);
+    }
+
+    public function setSeller(Uuid $seller): static
+    {
+        $this->seller = $seller;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CategoryErpProductSeller>
+     */
+    public function getCategoryErpProductSeller(): Collection
+    {
+        return $this->categoryErpProductSeller;
+    }
+
+    public function addCategoryErpProductSeller(CategoryErpProductSeller $categoryErpProductSeller): static
+    {
+        if (!$this->categoryErpProductSeller->contains($categoryErpProductSeller)) {
+            $this->categoryErpProductSeller->add($categoryErpProductSeller);
+            $categoryErpProductSeller->setProductSeller($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategoryErpProductSeller(CategoryErpProductSeller $categoryErpProductSeller): static
+    {
+        if ($this->categoryErpProductSeller->removeElement($categoryErpProductSeller)) {
+            // set the owning side to null (unless already changed)
+            if ($categoryErpProductSeller->getProductSeller() === $this) {
+                $categoryErpProductSeller->setProductSeller(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPromotions(): ?ArrayCollection
+    {
+        $promotions = new ArrayCollection();
+        $entityManager = ManagerRegistry::class->getManager('promotions');
+        $promotionProductSellerOrErpErpRepository = $entityManager->getRepository(PromotionProductSellerOrErp::class);
+        foreach($promotionProductSellerOrErpErpRepository->findBy(['product' => $this->id]) as $relation)
+        {
+            $promotions->add($relation->getPromotion);
+        }
+
+        return $promotions;
+    }
+
+    public function getCategories(): ?ArrayCollection
+    {
+        $categories = new ArrayCollection();
+        foreach($this->getCategoryErpProductSeller() as $relation)
+        {
+            $categories->add($relation->getCategoryErp());
+        }
+
+        return $categories;
     }
 }

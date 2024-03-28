@@ -2,10 +2,14 @@
 
 namespace App\Entity\Reviews;
 
+use App\Entity\Erp\ProductErp;
+use App\Entity\Products\ProductSeller;
+use App\Entity\Users\Users;
 use App\Repository\Reviews\ReviewRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -31,6 +35,12 @@ class Review
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $product = null;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $user = null;
 
     public function __construct()
     {
@@ -100,6 +110,42 @@ class Review
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getProduct(): null|ProductErp|ProductSeller
+    {
+        $entityManagerErp = ManagerRegistry::class->getManager('erp');
+        $productErpRepository = $entityManagerErp->getRepository(ProductErp::class);
+        $product = $productErpRepository->find($this->product);
+
+        if ($product === null) {
+            $entityManagerSeller = ManagerRegistry::class->getManager('seller');
+            $productSellerRepository = $entityManagerSeller->getRepository(ProductSeller::class);
+            $product = $productSellerRepository->find($this->product);
+        }
+
+        return $product;
+    }
+
+    public function setProduct(Uuid $product): static
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        $entityManager = ManagerRegistry::class->getManager('default');
+        $userRepository = $entityManager->getRepository(Users::class);
+        return $userRepository->find($this->user);
+    }
+
+    public function setUser(Uuid $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

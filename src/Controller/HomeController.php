@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Orders\Order;
 use App\Entity\Users\Address;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
