@@ -9,12 +9,12 @@ services:
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
       TRUSTED_HOSTS: ^${SERVER_NAME:-example\.com|localhost}|php$$
       # Run "composer require symfony/orm-pack" to install and configure Doctrine ORM
-      DATABASE_USERS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-users:5432/${POSTGRES_DB:-db-users}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
-      DATABASE_ORDERS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-orders:5433/${POSTGRES_DB:-db-orders}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
-      DATABASE_ERP_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-erp:5434/${POSTGRES_DB:-db-erp}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
-      DATABASE_PRODUCTS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-products:5435/${POSTGRES_DB:-db-products}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
-      DATABASE_REVIEWS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-reviews:5436/${POSTGRES_DB:-db-reviews}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
-      DATABASE_PROMOTIONS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-promotions:5436/${POSTGRES_DB:-db-promotions}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_USERS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-users:5432/${POSTGRES_DB:-db_users}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_ORDERS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-orders:5432/${POSTGRES_DB:-db_orders}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_ERP_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-erp:5432/${POSTGRES_DB:-db_erp}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_PRODUCTS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-products:5432/${POSTGRES_DB:-db_products}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_REVIEWS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-reviews:5432/${POSTGRES_DB:-db_reviews}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+      DATABASE_PROMOTIONS_URL: postgresql://${POSTGRES_USER:-root}:${POSTGRES_PASSWORD:-master}@database-promotions:5432/${POSTGRES_DB:-db_promotions}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
       # Run "composer require symfony/mercure-bundle" to install and configure the Mercure integration
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
       MERCURE_PUBLIC_URL: https://${SERVER_NAME:-localhost}/.well-known/mercure
@@ -38,82 +38,100 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+    networks:
+      - flowerpower
         
   database-users:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-users}
+      POSTGRES_DB: ${POSTGRES_DB:-db_users}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/users:/var/lib/postgresql/data
+      - ./docker/db/data/users:/var/lib/postgresql/data --clean
     ports:
       - "5432:5432"
+    networks:
+      - flowerpower
 
   database-orders:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-orders}
+      POSTGRES_DB: ${POSTGRES_DB:-db_orders}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/orders:/var/lib/postgresql/data
+      - ./docker/db/data/orders:/var/lib/postgresql/data --clean
     ports:
       - "5433:5432"
+    networks:
+      - flowerpower
   
   database-erp:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-erp}
+      POSTGRES_DB: ${POSTGRES_DB:-db_erp}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/erp:/var/lib/postgresql/data
+      - ./docker/db/data/erp:/var/lib/postgresql/data --clean
     ports:
       - "5434:5432"
+    networks:
+      - flowerpower
 
   database-products:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-products}
+      POSTGRES_DB: ${POSTGRES_DB:-db_products}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/products:/var/lib/postgresql/data
+      - ./docker/db/data/products:/var/lib/postgresql/data --clean
     ports:
       - "5435:5432"
+    networks:
+      - flowerpower
 
   database-reviews:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-reviews}
+      POSTGRES_DB: ${POSTGRES_DB:-db_reviews}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/reviews:/var/lib/postgresql/data
+      - ./docker/db/data/reviews:/var/lib/postgresql/data --clean
     ports:
       - "5436:5432"
+    networks:
+      - flowerpower
 
   database-promotions:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-promotions}
+      POSTGRES_DB: ${POSTGRES_DB:-db_promotions}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/promotions:/var/lib/postgresql/data
+      - ./docker/db/data/promotions:/var/lib/postgresql/data --clean
     ports:
       - "5437:5432"
+    networks:
+      - flowerpower
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
+networks:
+  flowerpower:
+    # Use a custom driver
+    driver: bridge
 
 volumes:
   caddy_data:

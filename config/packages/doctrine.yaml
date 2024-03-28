@@ -1,99 +1,187 @@
 doctrine:
     dbal:
-#        url: '%env(resolve:DATABASE_URL)%'
         connections:
             users:
-                url: '%env(resolve:DATABASE_USERS_URL)%'
-                use_savepoints: true
+#                url: '%env(resolve:DATABASE_USERS_URL)%'
+#                use_savepoints: true
+                host: '%env(DATABASE_USERS_HOST)%'
+                user: '%env(DATABASE_USERS_USER)%'
+                password: '%env(DATABASE_USERS_PASSWORD)%'
+                port: '%env(DATABASE_USERS_PORT)%'
+                dbname: '%env(DATABASE_USERS_DBNAME)%'
+                driver: '%env(DATABASE_USERS_DRIVER)%'
+                server_version: '%env(DATABASE_USERS_SERVER_VERSION)%'
+                charset: '%env(DATABASE_USERS_CHARSET)%'
             orders:
-                url: '%env(resolve:DATABASE_ORDERS_URL)%'
-                use_savepoints: true
+#                url: '%env(resolve:DATABASE_ORDERS_URL)%'
+                host: '%env(DATABASE_ORDERS_HOST)%'
+                user: '%env(DATABASE_ORDERS_USER)%'
+                password: '%env(DATABASE_ORDERS_PASSWORD)%'
+                port: '%env(DATABASE_ORDERS_PORT)%'
+                dbname: '%env(DATABASE_ORDERS_DBNAME)%'
+                driver: '%env(DATABASE_ORDERS_DRIVER)%'
+                server_version: '%env(DATABASE_ORDERS_SERVER_VERSION)%'
+                charset: '%env(DATABASE_ORDERS_CHARSET)%'
             erp:
-                url: '%env(resolve:DATABASE_ERP_URL)%'
-                use_savepoints: true
+#                url: '%env(resolve:DATABASE_ERP_URL)%'
+#                use_savepoints: true
+                host: '%env(DATABASE_ERP_HOST)%'
+                user: '%env(DATABASE_ERP_USER)%'
+                password: '%env(DATABASE_ERP_PASSWORD)%'
+                port: '%env(DATABASE_ERP_PORT)%'
+                dbname: '%env(DATABASE_ERP_DBNAME)%'
+                driver: '%env(DATABASE_ERP_DRIVER)%'
+                server_version: '%env(DATABASE_ERP_SERVER_VERSION)%'
+                charset: '%env(DATABASE_ERP_CHARSET)%'
             products:
-                url: '%env(resolve:DATABASE_PRODUCTS_URL)%'
-                use_savepoints: true
+#                url: '%env(resolve:DATABASE_PRODUCTS_URL)%'
+#                use_savepoints: true
+                host: '%env(DATABASE_PRODUCTS_HOST)%'
+                user: '%env(DATABASE_PRODUCTS_USER)%'
+                password: '%env(DATABASE_PRODUCTS_PASSWORD)%'
+                port: '%env(DATABASE_PRODUCTS_PORT)%'
+                dbname: '%env(DATABASE_PRODUCTS_DBNAME)%'
+                driver: '%env(DATABASE_PRODUCTS_DRIVER)%'
+                server_version: '%env(DATABASE_PRODUCTS_SERVER_VERSION)%'
+                charset: '%env(DATABASE_PRODUCTS_CHARSET)%'
             reviews:
-                url: '%env(resolve:DATABASE_REVIEWS_URL)%'
-                use_savepoints: true
+#                url: '%env(resolve:DATABASE_REVIEWS_URL)%'
+#                use_savepoints: true
+                host: '%env(DATABASE_REVIEWS_HOST)%'
+                user: '%env(DATABASE_REVIEWS_USER)%'
+                password: '%env(DATABASE_REVIEWS_PASSWORD)%'
+                port: '%env(DATABASE_REVIEWS_PORT)%'
+                dbname: '%env(DATABASE_REVIEWS_DBNAME)%'
+                driver: '%env(DATABASE_REVIEWS_DRIVER)%'
+                server_version: '%env(DATABASE_REVIEWS_SERVER_VERSION)%'
+                charset: '%env(DATABASE_REVIEWS_CHARSET)%'
             promotions:
-                url: '%env(resolve:DATABASE_PROMOTIONS_URL)%'
-                use_savepoints: true
+#                url: '%env(resolve:DATABASE_PROMOTIONS_URL)%'
+#                use_savepoints: true
+                host: '%env(DATABASE_PROMOTIONS_HOST)%'
+                user: '%env(DATABASE_PROMOTIONS_USER)%'
+                password: '%env(DATABASE_PROMOTIONS_PASSWORD)%'
+                port: '%env(DATABASE_PROMOTIONS_PORT)%'
+                dbname: '%env(DATABASE_PROMOTIONS_DBNAME)%'
+                driver: '%env(DATABASE_PROMOTIONS_DRIVER)%'
+                server_version: '%env(DATABASE_PROMOTIONS_SERVER_VERSION)%'
+                charset: '%env(DATABASE_PROMOTIONS_CHARSET)%'
             
         default_connection: users
         types:
             point: CrEOF\Spatial\DBAL\Types\Geometry\PointType
             geometry: CrEOF\Spatial\DBAL\Types\GeometryType
     orm:
-        auto_generate_proxy_classes: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
-        dql:
-            numeric_functions:
-                area: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Area
-                asbinary: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\AsBinary
-                astext: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\AsText
-                buffer: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Buffer
-                centroid: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Centroid
-                contains: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Contains
-                crosses: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Crosses
-                dimension: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Dimension
-                distance: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Distance
-                disjoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Disjoint
-                distancefrommultyLine: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\DistanceFromMultyLine
-                endpoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\EndPoint
-                envelope: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Envelope
-                equals: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Equals
-                exteriorring: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\ExteriorRing
-                geodistpt: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GeodistPt
-                geometrytype: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GeometryType
-                geomfromtext: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GeomFromText
-                glength: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GLength
-                interiorringn: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\InteriorRingN
-                intersects: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Intersects
-                isclosed: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\IsClosed
-                isempty: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\IsEmpty
-                issimple: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\IsSimple
-                linestringfromwkb: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\LineStringFromWKB
-                linestring: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\LineString
-                mbrcontains: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRContains
-                mbrdisjoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRDisjoint
-                mbrequal: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBREqual
-                mbrintersects: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRIntersects
-                mbroverlaps: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBROverlaps
-                mbrtouches: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRTouches
-                mbrwithin: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRWithin
-                numinteriorrings: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\NumInteriorRings
-                numpoints: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\NumPoints
-                overlaps: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Overlaps
-                pointfromwkb: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\PointFromWKB
-                pointn: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\PointN
-                point: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Point
-                srid: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\SRID
-                startpoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\StartPoint
-                st_buffer: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STBuffer
-                st_contains: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STContains
-                st_crosses: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STCrosses
-                st_disjoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDisjoint
-                st_distance: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDistance
-                st_distance_sphere: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDistanceSphere
-                st_geom_from_text: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STGeomFromText
-                st_equals: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STEquals
-                st_intersects: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STIntersects
-                st_overlaps: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STOverlaps
-                st_touches: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STTouches
-                st_within: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STWithin
-                touches: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Touches
-                within: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Within
-                x: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\X
-                y: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Y
+        default_entity_manager: default
+        entity_managers:
+            default:
+                connection: users
+                mappings:
+                    Users:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Users'
+                        prefix: 'App\Entity\Users'
+                        alias: Users
+                dql:
+                    numeric_functions:
+                        area: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Area
+                        asbinary: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\AsBinary
+                        astext: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\AsText
+                        buffer: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Buffer
+                        centroid: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Centroid
+                        contains: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Contains
+                        crosses: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Crosses
+                        dimension: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Dimension
+                        distance: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Distance
+                        disjoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Disjoint
+                        distancefrommultyLine: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\DistanceFromMultyLine
+                        endpoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\EndPoint
+                        envelope: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Envelope
+                        equals: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Equals
+                        exteriorring: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\ExteriorRing
+                        geodistpt: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GeodistPt
+                        geometrytype: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GeometryType
+                        geomfromtext: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GeomFromText
+                        glength: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\GLength
+                        interiorringn: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\InteriorRingN
+                        intersects: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Intersects
+                        isclosed: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\IsClosed
+                        isempty: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\IsEmpty
+                        issimple: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\IsSimple
+                        linestringfromwkb: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\LineStringFromWKB
+                        linestring: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\LineString
+                        mbrcontains: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRContains
+                        mbrdisjoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRDisjoint
+                        mbrequal: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBREqual
+                        mbrintersects: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRIntersects
+                        mbroverlaps: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBROverlaps
+                        mbrtouches: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRTouches
+                        mbrwithin: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\MBRWithin
+                        numinteriorrings: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\NumInteriorRings
+                        numpoints: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\NumPoints
+                        overlaps: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Overlaps
+                        pointfromwkb: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\PointFromWKB
+                        pointn: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\PointN
+                        point: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Point
+                        srid: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\SRID
+                        startpoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\StartPoint
+                        st_buffer: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STBuffer
+                        st_contains: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STContains
+                        st_crosses: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STCrosses
+                        st_disjoint: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDisjoint
+                        st_distance: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDistance
+                        st_distance_sphere: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STDistanceSphere
+                        st_geom_from_text: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STGeomFromText
+                        st_equals: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STEquals
+                        st_intersects: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STIntersects
+                        st_overlaps: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STOverlaps
+                        st_touches: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STTouches
+                        st_within: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\STWithin
+                        touches: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Touches
+                        within: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Within
+                        x: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\X
+                        y: CrEOF\Spatial\ORM\Query\AST\Functions\MySql\Y
+            orders:
+                connection: orders
+                mappings:
+                    Orders:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Orders'
+                        prefix: 'App\Entity\Orders'
+                        alias: Orders
+            erp:
+                connection: erp
+                mappings:
+                    Erp:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Erp'
+                        prefix: 'App\Entity\Erp'
+                        alias: Erp
+            products:
+                connection: products
+                mappings:
+                    Products:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Products'
+                        prefix: 'App\Entity\Products'
+                        alias: Products
+            reviews:
+                connection: reviews
+                mappings:
+                    Reviews:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Reviews'
+                        prefix: 'App\Entity\Reviews'
+                        alias: Reviews
+            promotions:
+                connection: promotions
+                mappings:
+                    Promotions:
+                        is_bundle: false
+                        dir: '%kernel.project_dir%/src/Entity/Promotions'
+                        prefix: 'App\Entity\Promotions'
+                        alias: Promotions
+
 
 when@test:
     doctrine:
