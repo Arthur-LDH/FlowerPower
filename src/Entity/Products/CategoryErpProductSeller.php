@@ -39,9 +39,9 @@ class CategoryErpProductSeller
         return $categoryErpRepository->find($this->categoryErp);
     }
 
-    public function setCategoryErp(Uuid $categoryErp): static
+    public function setCategoryErp(CategoryErp $categoryErp): static
     {
-        $this->categoryErp = $categoryErp;
+        $this->categoryErp = $categoryErp->getId();
 
         return $this;
     }

@@ -48,9 +48,9 @@ class PromotionProductSellerOrErp
         return $product;
     }
 
-    public function setProduct(Uuid $product): static
+    public function setProduct(ProductSeller|ProductErp $product): static
     {
-        $this->product = $product;
+        $this->product = $product->getId();
 
         return $this;
     }

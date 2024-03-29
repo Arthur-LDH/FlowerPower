@@ -22,7 +22,7 @@ class UsersOrders
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $user = null;
+    private ?Uuid $users = null;
 
     #[ORM\Column(length: 50)]
     private ?string $payment_intent = null;
@@ -52,11 +52,6 @@ class UsersOrders
     {
         $this->setUpdatedAt(new DateTimeImmutable());
         return $this;
-    }
-
-    public function getId(): ?Uuid
-    {
-        return $this->id;
     }
 
     public function getPaymentIntent(): ?string
@@ -123,12 +118,12 @@ class UsersOrders
     {
         $entityManager = ManagerRegistry::class->getManager('default');
         $userRepository = $entityManager->getRepository(Users::class);
-        return $userRepository->find($this->user);
+        return $userRepository->find($this->users);
     }
 
-    public function setUsers(Uuid $user): static
+    public function setUsers(Users $users): static
     {
-        $this->user = $user;
+        $this->users = $users->getId();
 
         return $this;
     }

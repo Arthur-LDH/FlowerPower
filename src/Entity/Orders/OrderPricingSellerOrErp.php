@@ -64,9 +64,9 @@ class OrderPricingSellerOrErp
         return $pricing;
     }
 
-    public function setPricing(Uuid $pricing): static
+    public function setPricing(PricingSeller|PricingErp $pricing): static
     {
-        $this->pricing = $pricing;
+        $this->pricing = $pricing->getId();
 
         return $this;
     }

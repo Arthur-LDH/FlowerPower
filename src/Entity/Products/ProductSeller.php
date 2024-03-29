@@ -229,9 +229,9 @@ class ProductSeller
         return $sellerRepository->find($this->seller);
     }
 
-    public function setSeller(Uuid $seller): static
+    public function setSeller(Seller $seller): static
     {
-        $this->seller = $seller;
+        $this->seller = $seller->getId();
 
         return $this;
     }

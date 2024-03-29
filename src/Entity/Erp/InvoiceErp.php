@@ -2,7 +2,9 @@
 
 namespace App\Entity\Erp;
 
+use App\Entity\Orders\Orders;
 use App\Entity\Orders\UsersOrders;
+use App\Entity\Users\Seller;
 use App\Repository\Erp\InvoiceErpRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,9 +39,9 @@ class InvoiceErp
         return $userOrderRepository->findBy(['user' => $this->id]);
     }
 
-    public function setOrders(Uuid $orders): static
+    public function setOrders(Orders $orders): static
     {
-        $this->orders = $orders;
+        $this->orders = $orders->getId();
 
         return $this;
     }
@@ -49,9 +51,9 @@ class InvoiceErp
         return $this->seller;
     }
 
-    public function setSeller(Uuid $seller): static
+    public function setSeller(Seller $seller): static
     {
-        $this->seller = $seller;
+        $this->seller = $seller->getId();
 
         return $this;
     }

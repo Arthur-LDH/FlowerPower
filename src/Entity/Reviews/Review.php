@@ -40,7 +40,7 @@ class Review
     private ?Uuid $product = null;
 
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $user = null;
+    private ?Uuid $users = null;
 
     public function __construct()
     {
@@ -129,9 +129,9 @@ class Review
         return $product;
     }
 
-    public function setProduct(Uuid $product): static
+    public function setProduct(ProductErp|ProductSeller $product): static
     {
-        $this->product = $product;
+        $this->product = $product->getId();
 
         return $this;
     }
@@ -140,12 +140,12 @@ class Review
     {
         $entityManager = ManagerRegistry::class->getManager('default');
         $userRepository = $entityManager->getRepository(Users::class);
-        return $userRepository->find($this->user);
+        return $userRepository->find($this->users);
     }
 
-    public function setUser(Uuid $user): static
+    public function setUser(Users $users): static
     {
-        $this->user = $user;
+        $this->users = $users->getId();
 
         return $this;
     }

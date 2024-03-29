@@ -170,9 +170,9 @@ class Orders
         return $addressRepository->find($this->address);
     }
 
-    public function setAddress(Uuid $address): static
+    public function setAddress(Address $address): static
     {
-        $this->address = $address;
+        $this->address = $address->getId();
 
         return $this;
     }
