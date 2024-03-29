@@ -24,6 +24,8 @@ class HomeController extends AbstractController
         $product->setDescription('Test');
         $product->setSeasonalityStart(new \DateTime('now'));
         $product->setSeasonalityEnd(new \DateTime('now'));
+        $product->addCategoryErp($category);
+        $entityManager->persist($product);
 
         $entityManager->flush();
         dd($category, $product);
