@@ -25,6 +25,9 @@ class OrderPricingSellerOrErp
     #[ORM\Column]
     private ?int $quantity = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
+
     public function getQuantity(): ?int
     {
         return $this->quantity;
@@ -49,16 +52,28 @@ class OrderPricingSellerOrErp
         return $this;
     }
 
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
+    }
+
+
     public function getPricing(): null|PricingErp|PricingSeller
     {
-        $entityManagerErp = ManagerRegistry::class->getManager('erp');
-        $productErpRepository = $entityManagerErp->getRepository(PricingErp::class);
-        $pricing = $productErpRepository->find($this->pricing);
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManagerErp = $this->managerRegistry->getManager('erp');
+        $pricingErpRepository = $entityManagerErp->getRepository(PricingErp::class);
+        $pricing = $pricingErpRepository->find($this->pricing);
 
         if ($pricing === null) {
-            $entityManagerSeller = ManagerRegistry::class->getManager('seller');
-            $productSellerRepository = $entityManagerSeller->getRepository(PricingSeller::class);
-            $pricing = $productSellerRepository->find($this->pricing);
+            $entityManagerSeller = $this->managerRegistry->getManager('products');
+            $pricingSellerRepository = $entityManagerSeller->getRepository(PricingSeller::class);
+            $pricing = $pricingSellerRepository->find($this->pricing);
         }
 
         return $pricing;

@@ -57,6 +57,9 @@ class ProductSeller
     #[ORM\OneToMany(targetEntity: CategoryErpProductSeller::class, mappedBy: 'productSeller')]
     private Collection $categoryErpProductSeller;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -185,9 +188,13 @@ class ProductSeller
         return $this;
     }
 
-    public function getReviews(): ArrayCollection
+    public function getReviews(): array
     {
-        $entityManager = ManagerRegistry::class->getManager('reviews');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('reviews');
         $reviewRepository = $entityManager->getRepository(Review::class);
         return $reviewRepository->findBy(['user' => $this->id]);
     }
@@ -224,7 +231,11 @@ class ProductSeller
 
     public function getSeller(): ?Seller
     {
-        $entityManager = ManagerRegistry::class->getManager('default');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
         $sellerRepository = $entityManager->getRepository(Seller::class);
         return $sellerRepository->find($this->seller);
     }
@@ -266,14 +277,27 @@ class ProductSeller
         return $this;
     }
 
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
+    }
+
     public function getPromotions(): ?ArrayCollection
     {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
         $promotions = new ArrayCollection();
-        $entityManager = ManagerRegistry::class->getManager('promotions');
+        $entityManager = $this->managerRegistry->getManager('promotions');
         $promotionProductSellerOrErpErpRepository = $entityManager->getRepository(PromotionProductSellerOrErp::class);
         foreach($promotionProductSellerOrErpErpRepository->findBy(['product' => $this->id]) as $relation)
         {
-            $promotions->add($relation->getPromotion);
+            if ($relation instanceof PromotionProductSellerOrErp) {
+                $promotions->add($relation->getPromotion());
+            }
         }
 
         return $promotions;

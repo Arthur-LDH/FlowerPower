@@ -27,14 +27,20 @@ class InvoiceErp
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $seller = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function getOrders(): ?UsersOrders
+    public function getOrders(): array
     {
-        $entityManager = ManagerRegistry::class->getManager('orders');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('orders');
         $userOrderRepository = $entityManager->getRepository(UsersOrders::class);
         return $userOrderRepository->findBy(['user' => $this->id]);
     }
@@ -54,6 +60,13 @@ class InvoiceErp
     public function setSeller(Seller $seller): static
     {
         $this->seller = $seller->getId();
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

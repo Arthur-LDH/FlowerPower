@@ -27,7 +27,7 @@ class Orders
     #[ORM\Column]
     private ?int $status = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $payed_at = null;
 
     #[ORM\Column]
@@ -36,7 +36,7 @@ class Orders
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ORM\OneToMany(targetEntity: OrderPricingSellerOrErp::class, mappedBy: 'orders')]
@@ -47,6 +47,8 @@ class Orders
 
     #[ORM\OneToMany(targetEntity: UsersOrders::class, mappedBy: 'orders', orphanRemoval: true)]
     private Collection $usersOrders;
+
+    private ?ManagerRegistry $managerRegistry = null;
 
     public function __construct()
     {
@@ -165,7 +167,11 @@ class Orders
 
     public function getAddress(): ?Address
     {
-        $entityManager = ManagerRegistry::class->getManager('default');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
         $addressRepository = $entityManager->getRepository(Address::class);
         return $addressRepository->find($this->address);
     }
@@ -203,6 +209,13 @@ class Orders
                 $usersOrder->setOrders(null);
             }
         }
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

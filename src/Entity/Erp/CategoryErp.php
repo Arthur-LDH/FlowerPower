@@ -28,6 +28,8 @@ class CategoryErp
     #[ORM\ManyToMany(targetEntity: ProductErp::class, mappedBy: 'categoryErp')]
     private Collection $productErps;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function __construct()
     {
         $this->productErps = new ArrayCollection();
@@ -50,10 +52,21 @@ class CategoryErp
         return $this;
     }
 
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
+    }
+
     public function getPromotions(): ArrayCollection
     {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
         $promotions = new ArrayCollection();
-        $entityManager = ManagerRegistry::class->getManager('promotions');
+        $entityManager = $this->managerRegistry->getManager('promotions');
         $promotionCategoryRepository = $entityManager->getRepository(PromotionCategory::class);
         foreach($promotionCategoryRepository->findBy(['categoryErp' => $this->id]) as $relation)
         {
@@ -92,8 +105,12 @@ class CategoryErp
 
     public function getProductSellers(): ArrayCollection
     {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
         $productSellers = new ArrayCollection();
-        $entityManager = ManagerRegistry::class->getManager('products');
+        $entityManager = $this->managerRegistry->getManager('products');
         $categoryErpProductSeller = $entityManager->getRepository(CategoryErpProductSeller::class);
         foreach($categoryErpProductSeller->findBy(['categoryErp' => $this->id]) as $relation)
         {

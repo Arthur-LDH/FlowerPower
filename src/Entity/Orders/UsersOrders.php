@@ -36,6 +36,8 @@ class UsersOrders
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -116,7 +118,11 @@ class UsersOrders
 
     public function getUser(): ?Users
     {
-        $entityManager = ManagerRegistry::class->getManager('default');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
         $userRepository = $entityManager->getRepository(Users::class);
         return $userRepository->find($this->users);
     }
@@ -124,6 +130,13 @@ class UsersOrders
     public function setUsers(Users $users): static
     {
         $this->users = $users->getId();
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

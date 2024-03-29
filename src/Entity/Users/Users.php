@@ -67,6 +67,9 @@ class Users
     #[ORM\OneToMany(targetEntity: Seller::class, mappedBy: 'users')]
     private Collection $sellers;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -298,16 +301,31 @@ class Users
         return $this;
     }
 
-    public function getReviews(): ArrayCollection
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
     {
-        $entityManager = ManagerRegistry::class->getManager('reviews');
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
+    }
+
+    public function getReviews(): array
+    {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('reviews');
         $reviewRepository = $entityManager->getRepository(Review::class);
         return $reviewRepository->findBy(['user' => $this->id]);
     }
 
-    public function getUserOrders(): ArrayCollection
+    public function getUserOrders(): array
     {
-        $entityManager = ManagerRegistry::class->getManager('orders');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('orders');
         $userOrderRepository = $entityManager->getRepository(UsersOrders::class);
         return $userOrderRepository->findBy(['user' => $this->id]);
     }

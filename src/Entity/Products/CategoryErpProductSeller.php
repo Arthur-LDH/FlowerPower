@@ -20,6 +20,8 @@ class CategoryErpProductSeller
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $categoryErp = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function getProductSeller(): ?ProductSeller
     {
         return $this->productSeller;
@@ -34,7 +36,11 @@ class CategoryErpProductSeller
 
     public function getCategoryErp(): ?CategoryErp
     {
-        $entityManager = ManagerRegistry::class->getManager('erp');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('erp');
         $categoryErpRepository = $entityManager->getRepository(CategoryErp::class);
         return $categoryErpRepository->find($this->categoryErp);
     }
@@ -42,6 +48,13 @@ class CategoryErpProductSeller
     public function setCategoryErp(CategoryErp $categoryErp): static
     {
         $this->categoryErp = $categoryErp->getId();
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

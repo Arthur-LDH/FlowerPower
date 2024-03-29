@@ -24,7 +24,6 @@ use App\Entity\Users\UsersAddress;
 use App\Entity\Orders\Orders;
 use App\Entity\Orders\OrderPricingSellerOrErp;
 use App\Entity\Orders\UsersOrders;
-use App\Entity\Erp\InvoiceErp;
 use Faker\Factory;
 
 class AppFixtures extends Fixture
@@ -48,7 +47,7 @@ class AppFixtures extends Fixture
 ////             Users
 //// 100 users + address pour chaque
 ////===========================================
-//        for ($i = 1; $i <= 50; $i++) {
+//        for ($i = 1; $i <= 100; $i++) {
 //            $user = new Users();
 //            $user
 //                ->setFirstname($faker->firstName)
@@ -240,108 +239,136 @@ class AppFixtures extends Fixture
 //            }
 //        }
 //        $reviewsManager->flush();
-
-
-//===========================================
-//              PROMOTIONS
-//===========================================
-
-        for ($i = 1; $i <= 5; $i++) {
-            $promotion = new Promotion();
-            $promotion
-                ->setName($faker->words(2, true))
-                ->setPercentage(true)
-                ->setDiscount($faker->randomFloat(2, 1, $max = 90))
-                ->setStartFrom($faker->dateTimeBetween($startDate = '-1 month', $endDate = 'now'))
-                ->setEndAt($faker->dateTimeBetween($startDate = 'now', $endDate = '+1 month'))
-                ->setPromoCode($faker->regexify('[A-Z0-9]{10}'));
-            $promotionsManager->persist($promotion);
-
-
-            $associatedProductsIds = [];
-            $allProducts = array_merge(
-                $productsManager->getRepository(ProductSeller::class)->findAll(),
-                $erpManager->getRepository(ProductErp::class)->findAll()
-            );
-
-            for ($j = 1; $j <= mt_rand(2, 4); $j++) {
-                $randomProduct = $faker->randomElement($allProducts);
-                while (in_array($randomProduct->getId(), $associatedProductsIds)) {
-                    $randomProduct = $faker->randomElement($allProducts);
-                }
-                $associatedProductsIds[] = $randomProduct->getId();
-
-                $promotionProductSellerOrERP = new PromotionProductSellerOrErp();
-                $promotionProductSellerOrERP
-                    ->setPromotion($promotion)
-                    ->setProduct($randomProduct);
-                $promotionsManager->persist($promotionProductSellerOrERP);
-            }
-
-            $associatedCategoryIds = [];
-
-            for ($j = 1; $j <= mt_rand(1, 2); $j++) {
-                $randomCategoryErp = $faker->randomElement($erpManager->getRepository(CategoryErp::class)->findAll());
-                while (in_array($randomCategoryErp->getId(), $associatedCategoryIds)) {
-                    $randomCategoryErp = $faker->randomElement($erpManager->getRepository(CategoryErp::class)->findAll());
-                }
-                $associatedCategoryIds[] = $randomCategoryErp->getId();
-
-                $promotionCategory = new PromotionCategory();
-                $promotionCategory
-                    ->setPromotion($promotion)
-                    ->setCategoryErp($randomCategoryErp);
-                $promotionsManager->persist($promotionCategory);
-            }
-        }
-
-        $promotionsManager->flush();
-
+//
+//
 ////===========================================
-////              DATABASE ORDERS
+////              PROMOTIONS
 ////===========================================
 //
-//    $order = new Orders();
-//    $order
-//    ->setUid($faker->uuid)
-//    ->setStatus($faker->randomElement([0, 1, 2]))
-        //->setPayedAt($faker->dateTimeBetween('-1 months', 'now'))
-        //->setTotal($faker->randomFloat(2, 10, 1000))
-        //->setCreatedAt($faker->dateTimeBetween('-2 months', '-1 months'))
-        //->setUpdatedAt($faker->dateTime)
-        //->setAddressUid($faker->uuid);
-        //
-        //$manager->persist($order);
-        //
-        //$userOrder = new UsersOrders();
-        //$userOrder
-        //->setUserUid($faker->uuid)
-        //->setOrderUid($faker->uuid)
-        //->setPaymentIntent($faker->word)
-        //->setAmount($faker->randomFloat(2, 10, 1000))
-        //->setCreatedAt($faker->dateTimeBetween('-2 months', '-1 months'))
-        //->setUpdatedAt($faker->dateTime);
-        //
-        //$manager->persist($userOrder);
-        //
-        //$orderPricingSellerOrErp = new OrderPricingSellerOrErp();
-        //$orderPricingSellerOrErp
-        //->setProductSellerOrErpUid($faker->uuid)
-        //->setOrderUid($faker->uuid)
-        //->setQuantity($faker->numberBetween(1, 100));
-        //
-        //$manager->persist($orderPricingSellerOrErp);
-        //
-        //$manager->flush();
-        //$this->addReference('order', $order);
-        //$this->addReference('user order', $userOrder);
-        //$this->addReference('order pricing seller or erp', $orderPricingSellerOrErp);
+//        for ($i = 1; $i <= 5; $i++) {
+//            $promotion = new Promotion();
+//            $promotion
+//                ->setName($faker->words(2, true))
+//                ->setPercentage(true)
+//                ->setDiscount($faker->randomFloat(2, 1, $max = 90))
+//                ->setStartFrom($faker->dateTimeBetween($startDate = '-1 month', $endDate = 'now'))
+//                ->setEndAt($faker->dateTimeBetween($startDate = 'now', $endDate = '+1 month'))
+//                ->setPromoCode($faker->regexify('[A-Z0-9]{10}'));
+//            $promotionsManager->persist($promotion);
+//
+//
+//            $associatedProductsIds = [];
+//            $allProducts = array_merge(
+//                $productsManager->getRepository(ProductSeller::class)->findAll(),
+//                $erpManager->getRepository(ProductErp::class)->findAll()
+//            );
+//
+//            for ($j = 1; $j <= mt_rand(2, 4); $j++) {
+//                $randomProduct = $faker->randomElement($allProducts);
+//                while (in_array($randomProduct->getId(), $associatedProductsIds)) {
+//                    $randomProduct = $faker->randomElement($allProducts);
+//                }
+//                $associatedProductsIds[] = $randomProduct->getId();
+//
+//                $promotionProductSellerOrERP = new PromotionProductSellerOrErp();
+//                $promotionProductSellerOrERP
+//                    ->setPromotion($promotion)
+//                    ->setProduct($randomProduct);
+//                $promotionsManager->persist($promotionProductSellerOrERP);
+//            }
+//
+//            $associatedCategoryIds = [];
+//
+//            for ($j = 1; $j <= mt_rand(1, 2); $j++) {
+//                $randomCategoryErp = $faker->randomElement($erpManager->getRepository(CategoryErp::class)->findAll());
+//                while (in_array($randomCategoryErp->getId(), $associatedCategoryIds)) {
+//                    $randomCategoryErp = $faker->randomElement($erpManager->getRepository(CategoryErp::class)->findAll());
+//                }
+//                $associatedCategoryIds[] = $randomCategoryErp->getId();
+//
+//                $promotionCategory = new PromotionCategory();
+//                $promotionCategory
+//                    ->setPromotion($promotion)
+//                    ->setCategoryErp($randomCategoryErp);
+//                $promotionsManager->persist($promotionCategory);
+//            }
+//        }
+//
+//        $promotionsManager->flush();
 
+//===========================================
+//              DATABASE ORDERS
+//===========================================
 
-////===========================================
-////              INVOICE
-////===========================================
+        for ($i = 1; $i <= 200; $i++) {
+            $order = new Orders();
+            $order
+                ->setStatus($faker->randomElement([0, 1, 2, 3]))
+                ->setPayedAt(new \DateTime('now'))
+                ->setAddress($faker->randomElement($usersManager->getRepository(Address::class)->findAll()));
+            $ordersManager->persist($order);
 
+            $total = 0;
+
+            $associatedPricingsIds = [];
+            $allPricings = array_merge(
+                $productsManager->getRepository(PricingSeller::class)->findAll(),
+                $erpManager->getRepository(PricingErp::class)->findAll()
+            );
+            for ($j = 1; $j <= mt_rand(1, 5); $j++) {
+                $randomPricing = $faker->randomElement($allPricings);
+                while (in_array($randomPricing->getId(), $associatedPricingsIds)) {
+                    $randomPricing = $faker->randomElement($allPricings);
+                }
+                $associatedPricingsIds[] = $randomPricing->getId();
+
+                $orderPricingSellerOrErp = new OrderPricingSellerOrErp();
+                $orderPricingSellerOrErp
+                    ->setPricing($randomPricing)
+                    ->setOrders($order)
+                    ->setQuantity($faker->numberBetween(1, 3))
+                    ->setManagerRegistry($this->doctrine);
+
+                $ordersManager->persist($orderPricingSellerOrErp);
+
+                $productTotal = $orderPricingSellerOrErp->getPricing()->getPrice() * $orderPricingSellerOrErp->getQuantity();
+
+                if ($orderPricingSellerOrErp->getPricing() instanceof PricingSeller) {
+                    $product = $orderPricingSellerOrErp->getPricing()->getProductSeller();
+                } else {
+                    $product = $orderPricingSellerOrErp->getPricing()->getProductErp();
+                }
+                $product->setManagerRegistry($this->doctrine);
+                $promotions = $product->getPromotions();
+
+                foreach ($promotions as $promotion) {
+                    if ($order->getCreatedAt() >= $promotion->getStartFrom() && $order->getCreatedAt() <= $promotion->getEndAt()) {
+                        if ($promotion->isPercentage()) {
+                            $productTotal = $productTotal * ($promotion->getDiscount() / 100);
+                        } else {
+                            $productTotal -= $promotion->getDiscount();
+                        }
+                    }
+                }
+
+                $total += $productTotal;
+
+            }
+
+            $order->setTotal($total);
+
+            $userOrder = new UsersOrders();
+            $userOrder
+                ->setOrders($order)
+                ->setUsers($faker->randomElement($usersManager->getRepository(Users::class)->findAll()))
+                ->setPaymentIntent($faker->uuid)
+                ->setAmount($order->getTotal());
+
+            $ordersManager->persist($userOrder);
+
+        }
+
+        $ordersManager->flush();
 
     }
 

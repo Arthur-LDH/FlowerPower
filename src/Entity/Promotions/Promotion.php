@@ -58,7 +58,6 @@ class Promotion
         if ($this->getCreatedAt() == null) {
             $this->setCreatedAt(new DateTimeImmutable());
         }
-        $this->product = new ArrayCollection();
         $this->promotionProductSellerOrErps = new ArrayCollection();
         $this->promotionCategories = new ArrayCollection();
     }

@@ -21,6 +21,8 @@ class PromotionProductSellerOrErp
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $product = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function getPromotion(): ?Promotion
     {
         return $this->promotion;
@@ -33,14 +35,25 @@ class PromotionProductSellerOrErp
         return $this;
     }
 
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
+    }
+
     public function getProduct(): null|ProductErp|ProductSeller
     {
-        $entityManagerErp = ManagerRegistry::class->getManager('erp');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManagerErp = $this->managerRegistry->getManager('erp');
         $productErpRepository = $entityManagerErp->getRepository(ProductErp::class);
         $product = $productErpRepository->find($this->product);
 
         if ($product === null) {
-            $entityManagerSeller = ManagerRegistry::class->getManager('seller');
+            $entityManagerSeller = $this->managerRegistry->getManager('seller');
             $productSellerRepository = $entityManagerSeller->getRepository(ProductSeller::class);
             $product = $productSellerRepository->find($this->product);
         }

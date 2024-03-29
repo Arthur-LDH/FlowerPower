@@ -52,6 +52,8 @@ class Seller
     #[ORM\JoinColumn(nullable: false)]
     private ?Address $address = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -183,17 +185,32 @@ class Seller
         return $this;
     }
 
-    public function getProducts(): ArrayCollection
+    public function getProducts(): array
     {
-        $entityManager = ManagerRegistry::class->getManager('products');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('products');
         $productsSellerRepository = $entityManager->getRepository(ProductSeller::class);
         return $productsSellerRepository->findBy(['seller' => $this->id]);
     }
 
-    public function getInvoices(): ArrayCollection
+    public function getInvoices(): array
     {
-        $entityManager = ManagerRegistry::class->getManager('erp');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('erp');
         $invoiceErpRepository = $entityManager->getRepository(InvoiceErp::class);
         return $invoiceErpRepository->findBy(['seller' => $this->id]);
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
     }
 }

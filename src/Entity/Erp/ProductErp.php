@@ -48,6 +48,9 @@ class ProductErp
     #[ORM\ManyToMany(targetEntity: CategoryErp::class, inversedBy: 'productErps')]
     private Collection $categoryErp;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -147,12 +150,18 @@ class ProductErp
 
     public function getPromotions(): ?ArrayCollection
     {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
         $promotions = new ArrayCollection();
-        $entityManager = ManagerRegistry::class->getManager('promotions');
+        $entityManager = $this->managerRegistry->getManager('promotions');
         $promotionProductSellerOrErpErpRepository = $entityManager->getRepository(PromotionProductSellerOrErp::class);
         foreach($promotionProductSellerOrErpErpRepository->findBy(['product' => $this->id]) as $relation)
         {
-            $promotions->add($relation->getPromotion);
+            if ($relation instanceof PromotionProductSellerOrErp) {
+                $promotions->add($relation->getPromotion());
+            }
         }
 
         return $promotions;
@@ -208,6 +217,13 @@ class ProductErp
     public function removeCategoryErp(CategoryErp $categoryErp): static
     {
         $this->categoryErp->removeElement($categoryErp);
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

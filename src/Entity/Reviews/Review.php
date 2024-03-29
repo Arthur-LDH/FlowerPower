@@ -42,6 +42,8 @@ class Review
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $users = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
@@ -116,12 +118,16 @@ class Review
 
     public function getProduct(): null|ProductErp|ProductSeller
     {
-        $entityManagerErp = ManagerRegistry::class->getManager('erp');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManagerErp = $this->managerRegistry->getManager('erp');
         $productErpRepository = $entityManagerErp->getRepository(ProductErp::class);
         $product = $productErpRepository->find($this->product);
 
         if ($product === null) {
-            $entityManagerSeller = ManagerRegistry::class->getManager('seller');
+            $entityManagerSeller = $this->managerRegistry->getManager('seller');
             $productSellerRepository = $entityManagerSeller->getRepository(ProductSeller::class);
             $product = $productSellerRepository->find($this->product);
         }
@@ -138,7 +144,11 @@ class Review
 
     public function getUser(): ?Users
     {
-        $entityManager = ManagerRegistry::class->getManager('default');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
         $userRepository = $entityManager->getRepository(Users::class);
         return $userRepository->find($this->users);
     }
@@ -146,6 +156,13 @@ class Review
     public function setUser(Users $users): static
     {
         $this->users = $users->getId();
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

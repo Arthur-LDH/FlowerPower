@@ -20,6 +20,9 @@ class PromotionCategory
     #[ORM\Column(type: 'uuid')]
     private ?Uuid $categoryErp = null;
 
+    private ?ManagerRegistry $managerRegistry = null;
+
+
     public function getPromotion(): ?Promotion
     {
         return $this->promotion;
@@ -34,7 +37,11 @@ class PromotionCategory
 
     public function getCategoryErp(): ?CategoryErp
     {
-        $entityManager = ManagerRegistry::class->getManager('erp');
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('erp');
         $categoryErpRepository = $entityManager->getRepository(CategoryErp::class);
         return $categoryErpRepository->find($this->categoryErp);
     }
@@ -45,4 +52,12 @@ class PromotionCategory
 
         return $this;
     }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
+
+        return $this;
+    }
+
 }
