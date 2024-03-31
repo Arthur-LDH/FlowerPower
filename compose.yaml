@@ -51,7 +51,7 @@ services:
       - ./docker/db/data/users:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
+        
   database-basket:
     image: redis
     restart: unless-stopped
