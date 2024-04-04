@@ -5,6 +5,8 @@ namespace App\Repository\Orders;
 use App\Entity\Orders\Orders;
 use App\Entity\Products\PricingSeller;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -43,8 +45,9 @@ class OrdersRepository extends ServiceEntityRepository
             $product->setManagerRegistry($this->registry);
             $promotions = $product->getPromotions();
 
+            $now = new \DateTime('now');
             foreach ($promotions as $promotion) {
-                if ($order->getCreatedAt() >= $promotion->getStartFrom() && $order->getCreatedAt() <= $promotion->getEndAt()) {
+                if ($now >= $promotion->getStartFrom() && $now <= $promotion->getEndAt()) {
                     if ($promotion->isPercentage()) {
                         $productTotal = $productTotal * ($promotion->getDiscount() / 100);
                     } else {
