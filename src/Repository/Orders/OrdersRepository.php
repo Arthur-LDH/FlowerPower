@@ -17,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OrdersRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private ManagerRegistry $registry)
     {
         parent::__construct($registry, Orders::class);
     }
@@ -35,7 +35,6 @@ class OrdersRepository extends ServiceEntityRepository
         foreach($order->getOrderPricingSellerOrErps() as $orderPricingSellerOrErp){
             $orderPricingSellerOrErp->setManagerRegistry($this->registry);
             $productTotal = $orderPricingSellerOrErp->getPricing()->getPrice() * $orderPricingSellerOrErp->getQuantity();
-
             if ($orderPricingSellerOrErp->getPricing() instanceof PricingSeller) {
                 $product = $orderPricingSellerOrErp->getPricing()->getProductSeller();
             } else {
@@ -56,7 +55,6 @@ class OrdersRepository extends ServiceEntityRepository
 
             $total += $productTotal;
         }
-
 
 
         return $total;

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Erp\CategoryErp;
 use App\Entity\Erp\ProductErp;
+use App\Entity\Orders\Orders;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,21 +15,12 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(ManagerRegistry $doctrine): Response
     {
-        $entityManager = $doctrine->getManager('erp');
-        $category = new CategoryErp();
-        $category->setName('Test');
-        $entityManager->persist($category);
+        $entityManager = $doctrine->getManager('orders');
 
-        $product = new ProductErp();
-        $product->setName('Product Test');
-        $product->setDescription('Test');
-        $product->setSeasonalityStart(new \DateTime('now'));
-        $product->setSeasonalityEnd(new \DateTime('now'));
-        $product->addCategoryErp($category);
-        $entityManager->persist($product);
+        $order = $entityManager->getRepository(Orders::class)->find('1eef2603-083c-62aa-972d-e157a203f74b');
 
         $entityManager->flush();
-        dd($category, $product);
+        dd($order->getOrderPricingSellerOrErps()[1]->setManagerRegistry($doctrine)->getPricing());
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',

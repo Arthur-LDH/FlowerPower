@@ -157,7 +157,7 @@ class AppFixtures extends Fixture
                 $pricingSeller = new PricingSeller();
                 $pricingSeller
                     ->setName($faker->word)
-                    ->setPrice($faker->randomFloat(2, 1, 1000))
+                    ->setPrice($faker->randomFloat(2, 1, 200))
                     ->setTax(20)
                     ->setStockLeft($faker->numberBetween(0, 100))
                     ->setStockMin($faker->numberBetween(0, 10))
