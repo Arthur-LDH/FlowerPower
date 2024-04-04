@@ -4,6 +4,8 @@ namespace App\Entity\Promotions;
 
 use App\Repository\Promotions\PromotionRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
@@ -44,12 +46,20 @@ class Promotion
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
 
+    #[ORM\OneToMany(targetEntity: PromotionProductSellerOrErp::class, mappedBy: 'promotion')]
+    private Collection $promotionProductSellerOrErps;
+
+    #[ORM\OneToMany(targetEntity: PromotionCategory::class, mappedBy: 'promotion')]
+    private Collection $promotionCategories;
+
     public function __construct()
     {
         $this->setUpdatedAt(new DateTimeImmutable());
         if ($this->getCreatedAt() == null) {
             $this->setCreatedAt(new DateTimeImmutable());
         }
+        $this->promotionProductSellerOrErps = new ArrayCollection();
+        $this->promotionCategories = new ArrayCollection();
     }
 
     /**
@@ -159,6 +169,66 @@ class Promotion
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PromotionProductSellerOrErp>
+     */
+    public function getPromotionProductSellerOrErps(): Collection
+    {
+        return $this->promotionProductSellerOrErps;
+    }
+
+    public function addPromotionProductSellerOrErp(PromotionProductSellerOrErp $promotionProductSellerOrErp): static
+    {
+        if (!$this->promotionProductSellerOrErps->contains($promotionProductSellerOrErp)) {
+            $this->promotionProductSellerOrErps->add($promotionProductSellerOrErp);
+            $promotionProductSellerOrErp->setPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromotionProductSellerOrErp(PromotionProductSellerOrErp $promotionProductSellerOrErp): static
+    {
+        if ($this->promotionProductSellerOrErps->removeElement($promotionProductSellerOrErp)) {
+            // set the owning side to null (unless already changed)
+            if ($promotionProductSellerOrErp->getPromotion() === $this) {
+                $promotionProductSellerOrErp->setPromotion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PromotionCategory>
+     */
+    public function getPromotionCategories(): Collection
+    {
+        return $this->promotionCategories;
+    }
+
+    public function addPromotionCategory(PromotionCategory $promotionCategory): static
+    {
+        if (!$this->promotionCategories->contains($promotionCategory)) {
+            $this->promotionCategories->add($promotionCategory);
+            $promotionCategory->setPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromotionCategory(PromotionCategory $promotionCategory): static
+    {
+        if ($this->promotionCategories->removeElement($promotionCategory)) {
+            // set the owning side to null (unless already changed)
+            if ($promotionCategory->getPromotion() === $this) {
+                $promotionCategory->setPromotion(null);
+            }
+        }
 
         return $this;
     }

@@ -2,10 +2,14 @@
 
 namespace App\Entity\Orders;
 
+use App\Entity\Users\Address;
 use App\Repository\Orders\OrdersRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -23,7 +27,7 @@ class Orders
     #[ORM\Column]
     private ?int $status = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $payed_at = null;
 
     #[ORM\Column]
@@ -32,8 +36,19 @@ class Orders
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\OneToMany(targetEntity: OrderPricingSellerOrErp::class, mappedBy: 'orders')]
+    private Collection $orderPricingSellerOrErps;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $address = null;
+
+    #[ORM\OneToMany(targetEntity: UsersOrders::class, mappedBy: 'orders', orphanRemoval: true)]
+    private Collection $usersOrders;
+
+    private ?ManagerRegistry $managerRegistry = null;
 
     public function __construct()
     {
@@ -41,6 +56,8 @@ class Orders
         if ($this->getCreatedAt() == null) {
             $this->setCreatedAt(new DateTimeImmutable());
         }
+        $this->orderPricingSellerOrErps = new ArrayCollection();
+        $this->usersOrders = new ArrayCollection();
     }
 
     /**
@@ -114,6 +131,91 @@ class Orders
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderPricingSellerOrErp>
+     */
+    public function getOrderPricingSellerOrErps(): Collection
+    {
+        return $this->orderPricingSellerOrErps;
+    }
+
+    public function addOrderPricingSellerOrErp(OrderPricingSellerOrErp $orderPricingSellerOrErp): static
+    {
+        if (!$this->orderPricingSellerOrErps->contains($orderPricingSellerOrErp)) {
+            $this->orderPricingSellerOrErps->add($orderPricingSellerOrErp);
+            $orderPricingSellerOrErp->setOrders($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderPricingSellerOrErp(OrderPricingSellerOrErp $orderPricingSellerOrErp): static
+    {
+        if ($this->orderPricingSellerOrErps->removeElement($orderPricingSellerOrErp)) {
+            // set the owning side to null (unless already changed)
+            if ($orderPricingSellerOrErp->getOrders() === $this) {
+                $orderPricingSellerOrErp->setOrders(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
+        $addressRepository = $entityManager->getRepository(Address::class);
+        return $addressRepository->find($this->address);
+    }
+
+    public function setAddress(Address $address): static
+    {
+        $this->address = $address->getId();
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UsersOrders>
+     */
+    public function getUsersOrders(): Collection
+    {
+        return $this->usersOrders;
+    }
+
+    public function addUsersOrder(UsersOrders $usersOrder): static
+    {
+        if (!$this->usersOrders->contains($usersOrder)) {
+            $this->usersOrders->add($usersOrder);
+            $usersOrder->setOrders($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUsersOrder(UsersOrders $usersOrder): static
+    {
+        if ($this->usersOrders->removeElement($usersOrder)) {
+            // set the owning side to null (unless already changed)
+            if ($usersOrder->getOrders() === $this) {
+                $usersOrder->setOrders(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

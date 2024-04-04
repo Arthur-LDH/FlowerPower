@@ -2,11 +2,12 @@
 
 namespace App\Entity\Orders;
 
+use App\Entity\Users\Users;
 use App\Repository\Orders\UsersOrdersRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UsersOrdersRepository::class)]
@@ -15,10 +16,13 @@ use Symfony\Component\Uid\Uuid;
 class UsersOrders
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[ORM\ManyToOne(inversedBy: 'usersOrders')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Orders $orders = null;
+
+    #[ORM\Id]
     #[ORM\Column(type: 'uuid')]
-    private ?Uuid $id = null;
+    private ?Uuid $users = null;
 
     #[ORM\Column(length: 50)]
     private ?string $payment_intent = null;
@@ -31,6 +35,8 @@ class UsersOrders
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
+
+    private ?ManagerRegistry $managerRegistry = null;
 
     public function __construct()
     {
@@ -48,11 +54,6 @@ class UsersOrders
     {
         $this->setUpdatedAt(new DateTimeImmutable());
         return $this;
-    }
-
-    public function getId(): ?Uuid
-    {
-        return $this->id;
     }
 
     public function getPaymentIntent(): ?string
@@ -99,6 +100,43 @@ class UsersOrders
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getOrders(): ?Orders
+    {
+        return $this->orders;
+    }
+
+    public function setOrders(?Orders $orders): static
+    {
+        $this->orders = $orders;
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
+        $userRepository = $entityManager->getRepository(Users::class);
+        return $userRepository->find($this->users);
+    }
+
+    public function setUsers(Users $users): static
+    {
+        $this->users = $users->getId();
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }

@@ -43,11 +43,11 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-users}
+      POSTGRES_DB: ${POSTGRES_DB:-db_users}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/users:/var/lib/postgresql/data
+      - ./docker/db/data/users:/var/lib/postgresql/data --clean
     ports:
       - "5432:5432"
 
@@ -55,11 +55,11 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-orders}
+      POSTGRES_DB: ${POSTGRES_DB:-db_orders}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/orders:/var/lib/postgresql/data
+      - ./docker/db/data/orders:/var/lib/postgresql/data --clean
     ports:
       - "5433:5432"
   
@@ -67,11 +67,11 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-erp}
+      POSTGRES_DB: ${POSTGRES_DB:-db_erp}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/erp:/var/lib/postgresql/data
+      - ./docker/db/data/erp:/var/lib/postgresql/data --clean
     ports:
       - "5434:5432"
 
@@ -79,11 +79,11 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-products}
+      POSTGRES_DB: ${POSTGRES_DB:-db_products}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/products:/var/lib/postgresql/data
+      - ./docker/db/data/products:/var/lib/postgresql/data --clean
     ports:
       - "5435:5432"
 
@@ -91,11 +91,11 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-reviews}
+      POSTGRES_DB: ${POSTGRES_DB:-db_reviews}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/reviews:/var/lib/postgresql/data
+      - ./docker/db/data/reviews:/var/lib/postgresql/data --clean
     ports:
       - "5436:5432"
 
@@ -103,13 +103,19 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-db-promotions}
+      POSTGRES_DB: ${POSTGRES_DB:-db_promotions}
       POSTGRES_USER: ${POSTGRES_USER:-root}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-master}
     volumes:
-      - ./docker/db/data/promotions:/var/lib/postgresql/data
+      - ./docker/db/data/promotions:/var/lib/postgresql/data --clean
     ports:
       - "5437:5432"
+
+  database-basket:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###

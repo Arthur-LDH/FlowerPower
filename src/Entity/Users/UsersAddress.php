@@ -12,21 +12,20 @@ use Symfony\Component\Uid\Uuid;
 class UsersAddress
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[ORM\Column(type: 'uuid')]
-    private ?Uuid $id = null;
+    #[ORM\ManyToOne(inversedBy: 'usersAddresses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Users $users = null;
+
+    #[ORM\Id]
+    #[ORM\ManyToOne(inversedBy: 'usersAddresses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Address $address = null;
 
     #[ORM\Column(length: 100)]
     private ?string $label = null;
 
     #[ORM\Column]
     private ?bool $facturation = null;
-
-    public function getId(): ?Uuid
-    {
-        return $this->id;
-    }
 
     public function getLabel(): ?string
     {
@@ -48,6 +47,30 @@ class UsersAddress
     public function setFacturation(bool $facturation): static
     {
         $this->facturation = $facturation;
+
+        return $this;
+    }
+
+    public function getUsers(): ?Users
+    {
+        return $this->users;
+    }
+
+    public function setUsers(?Users $users): static
+    {
+        $this->users = $users;
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?Address $address): static
+    {
+        $this->address = $address;
 
         return $this;
     }

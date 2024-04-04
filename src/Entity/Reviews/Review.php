@@ -2,10 +2,14 @@
 
 namespace App\Entity\Reviews;
 
+use App\Entity\Erp\ProductErp;
+use App\Entity\Products\ProductSeller;
+use App\Entity\Users\Users;
 use App\Repository\Reviews\ReviewRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -31,6 +35,14 @@ class Review
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $product = null;
+
+    #[ORM\Column(type: 'uuid')]
+    private ?Uuid $users = null;
+
+    private ?ManagerRegistry $managerRegistry = null;
 
     public function __construct()
     {
@@ -100,6 +112,57 @@ class Review
     public function setUpdatedAt(?\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getProduct(): null|ProductErp|ProductSeller
+    {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManagerErp = $this->managerRegistry->getManager('erp');
+        $productErpRepository = $entityManagerErp->getRepository(ProductErp::class);
+        $product = $productErpRepository->find($this->product);
+
+        if ($product === null) {
+            $entityManagerSeller = $this->managerRegistry->getManager('seller');
+            $productSellerRepository = $entityManagerSeller->getRepository(ProductSeller::class);
+            $product = $productSellerRepository->find($this->product);
+        }
+
+        return $product;
+    }
+
+    public function setProduct(ProductErp|ProductSeller $product): static
+    {
+        $this->product = $product->getId();
+
+        return $this;
+    }
+
+    public function getUser(): ?Users
+    {
+        if (!$this->managerRegistry) {
+            throw new \RuntimeException('ManagerRegistry has not been set.');
+        }
+
+        $entityManager = $this->managerRegistry->getManager('default');
+        $userRepository = $entityManager->getRepository(Users::class);
+        return $userRepository->find($this->users);
+    }
+
+    public function setUser(Users $users): static
+    {
+        $this->users = $users->getId();
+
+        return $this;
+    }
+
+    public function setManagerRegistry(ManagerRegistry $managerRegistry): static
+    {
+        $this->managerRegistry = $managerRegistry;
 
         return $this;
     }
