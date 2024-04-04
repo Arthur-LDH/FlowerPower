@@ -3,6 +3,7 @@
 namespace App\Repository\Orders;
 
 use App\Entity\Orders\Orders;
+use App\Entity\Products\PricingSeller;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +22,43 @@ class OrdersRepository extends ServiceEntityRepository
         parent::__construct($registry, Orders::class);
     }
 
-    //    /**
-    //     * @return Orders[] Returns an array of Orders objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('o.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
 
-    //    public function findOneBySomeField($value): ?Orders
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * @param Orders $order
+     * @return float
+     */
+    public function calculateTotalOrder(Orders $order): float
+    {
+
+        $total = 0;
+
+        foreach($order->getOrderPricingSellerOrErps() as $orderPricingSellerOrErp){
+            $productTotal = $orderPricingSellerOrErp->getPricing()->getPrice() * $orderPricingSellerOrErp->getQuantity();
+
+            if ($orderPricingSellerOrErp->getPricing() instanceof PricingSeller) {
+                $product = $orderPricingSellerOrErp->getPricing()->getProductSeller();
+            } else {
+                $product = $orderPricingSellerOrErp->getPricing()->getProductErp();
+            }
+            $product->setManagerRegistry($this->registry);
+            $promotions = $product->getPromotions();
+
+            foreach ($promotions as $promotion) {
+                if ($order->getCreatedAt() >= $promotion->getStartFrom() && $order->getCreatedAt() <= $promotion->getEndAt()) {
+                    if ($promotion->isPercentage()) {
+                        $productTotal = $productTotal * ($promotion->getDiscount() / 100);
+                    } else {
+                        $productTotal -= $promotion->getDiscount();
+                    }
+                }
+            }
+
+            $total += $productTotal;
+        }
+
+
+
+        return $total;
+    }
+
 }

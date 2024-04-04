@@ -308,8 +308,6 @@ class AppFixtures extends Fixture
                 ->setAddress($faker->randomElement($usersManager->getRepository(Address::class)->findAll()));
             $ordersManager->persist($order);
 
-            $total = 0;
-
             $associatedPricingsIds = [];
             $allPricings = array_merge(
                 $productsManager->getRepository(PricingSeller::class)->findAll(),
@@ -330,32 +328,9 @@ class AppFixtures extends Fixture
                     ->setManagerRegistry($this->doctrine);
 
                 $ordersManager->persist($orderPricingSellerOrErp);
-
-                $productTotal = $orderPricingSellerOrErp->getPricing()->getPrice() * $orderPricingSellerOrErp->getQuantity();
-
-                if ($orderPricingSellerOrErp->getPricing() instanceof PricingSeller) {
-                    $product = $orderPricingSellerOrErp->getPricing()->getProductSeller();
-                } else {
-                    $product = $orderPricingSellerOrErp->getPricing()->getProductErp();
-                }
-                $product->setManagerRegistry($this->doctrine);
-                $promotions = $product->getPromotions();
-
-                foreach ($promotions as $promotion) {
-                    if ($order->getCreatedAt() >= $promotion->getStartFrom() && $order->getCreatedAt() <= $promotion->getEndAt()) {
-                        if ($promotion->isPercentage()) {
-                            $productTotal = $productTotal * ($promotion->getDiscount() / 100);
-                        } else {
-                            $productTotal -= $promotion->getDiscount();
-                        }
-                    }
-                }
-
-                $total += $productTotal;
-
             }
 
-            $order->setTotal($total);
+            $order->setTotal($ordersManager->getRepository(Orders::class)->calculateTotalOrder($order));
 
             $userOrder = new UsersOrders();
             $userOrder
