@@ -33,6 +33,7 @@ class OrdersRepository extends ServiceEntityRepository
         $total = 0;
 
         foreach($order->getOrderPricingSellerOrErps() as $orderPricingSellerOrErp){
+            $orderPricingSellerOrErp->setManagerRegistry($this->registry);
             $productTotal = $orderPricingSellerOrErp->getPricing()->getPrice() * $orderPricingSellerOrErp->getQuantity();
 
             if ($orderPricingSellerOrErp->getPricing() instanceof PricingSeller) {
