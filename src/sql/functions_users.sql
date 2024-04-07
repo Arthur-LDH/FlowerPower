@@ -17,11 +17,11 @@ CREATE TRIGGER before_password_update
 
 
 --test
-UPDATE "db_users".users SET password = 'initialPassword' WHERE id = '1eef3252-de25-61fe-93c7-ab4a9849f075';
+--UPDATE "db_users".users SET password = 'initialPassword' WHERE id = '1eef3252-de25-61fe-93c7-ab4a9849f075';
 
 -- Mettre à jour le mot de passe pour déclencher le trigger
-UPDATE "db_users".users SET password = 'newPassword' WHERE id = '1eef3252-de25-61fe-93c7-ab4a9849f075';
+--UPDATE "db_users".users SET password = 'newPassword' WHERE id = '1eef3252-de25-61fe-93c7-ab4a9849f075';
 
 -- Vérifier que l'ancien mot de passe est maintenant dans old_password
-SELECT password, old_password FROM "db_users".users WHERE id = '1eef3252-de25-61fe-93c7-ab4a9849f075';
+--SELECT password, old_password FROM "db_users".users WHERE id = '1eef3252-de25-61fe-93c7-ab4a9849f075';
 

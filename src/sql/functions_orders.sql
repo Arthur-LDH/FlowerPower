@@ -9,4 +9,4 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT calculate_average_basket();
+--SELECT calculate_average_basket();
