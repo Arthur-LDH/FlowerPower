@@ -157,7 +157,7 @@ class AppFixtures extends Fixture
                 $pricingSeller = new PricingSeller();
                 $pricingSeller
                     ->setName($faker->word)
-                    ->setPrice($faker->randomFloat(2, 1, 1000))
+                    ->setPrice($faker->randomFloat(2, 1, 200))
                     ->setTax(20)
                     ->setStockLeft($faker->numberBetween(0, 100))
                     ->setStockMin($faker->numberBetween(0, 10))
@@ -203,7 +203,7 @@ class AppFixtures extends Fixture
                 $pricingErp = new PricingErp();
                 $pricingErp
                     ->setName($faker->word)
-                    ->setPrice($faker->randomFloat(2, 10, 200))
+                    ->setPrice($faker->randomFloat(2, 1, 200))
                     ->setTax(20)
                     ->setStockLeft($faker->numberBetween(0, 100))
                     ->setStockMin($faker->numberBetween(10, 50))
@@ -308,6 +308,8 @@ class AppFixtures extends Fixture
                 ->setAddress($faker->randomElement($usersManager->getRepository(Address::class)->findAll()));
             $ordersManager->persist($order);
 
+            $total = 0;
+
             $associatedPricingsIds = [];
             $allPricings = array_merge(
                 $productsManager->getRepository(PricingSeller::class)->findAll(),
@@ -328,9 +330,31 @@ class AppFixtures extends Fixture
                     ->setManagerRegistry($this->doctrine);
 
                 $ordersManager->persist($orderPricingSellerOrErp);
+
+                $productTotal = $orderPricingSellerOrErp->getPricing()->getPrice() * $orderPricingSellerOrErp->getQuantity();
+
+                if ($orderPricingSellerOrErp->getPricing() instanceof PricingSeller) {
+                    $product = $orderPricingSellerOrErp->getPricing()->getProductSeller();
+                } else {
+                    $product = $orderPricingSellerOrErp->getPricing()->getProductErp();
+                }
+                $product->setManagerRegistry($this->doctrine);
+                $promotions = $product->getPromotions();
+
+                foreach ($promotions as $promotion) {
+                    if ($order->getCreatedAt() >= $promotion->getStartFrom() && $order->getCreatedAt() <= $promotion->getEndAt()) {
+                        if ($promotion->isPercentage()) {
+                            $productTotal = $productTotal * ($promotion->getDiscount() / 100);
+                        } else {
+                            $productTotal -= $promotion->getDiscount();
+                        }
+                    }
+                }
+
+                $total += $productTotal;
             }
 
-            $order->setTotal($ordersManager->getRepository(Orders::class)->calculateTotalOrder($order));
+            $order->setTotal($total);
 
             $userOrder = new UsersOrders();
             $userOrder
