@@ -41,8 +41,8 @@ final class Version20240328155424 extends AbstractMigration
         $this->addSql('ALTER TABLE db_users.seller ADD CONSTRAINT FK_99EFCA3BF5B7AF75 FOREIGN KEY (address_id) REFERENCES db_users.address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_users.usersAddress ADD CONSTRAINT FK_AFD11D2A67B3B43D FOREIGN KEY (users_id) REFERENCES db_users.users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_users.usersAddress ADD CONSTRAINT FK_AFD11D2AF5B7AF75 FOREIGN KEY (address_id) REFERENCES db_users.address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $sql_users =file_get_contents('./src/sql/functions_users.sql');
-        $this->addSql($sql_users);
+        $this->addSql($this->saveOldPassword());
+        $this->addSql($this->beforePasswordUpdate());
     }
 
     public function down(Schema $schema): void
@@ -58,6 +58,28 @@ final class Version20240328155424 extends AbstractMigration
         $this->addSql('DROP TABLE db_users.users');
         $this->addSql('DROP TABLE db_users.usersAddress');
         $this->addSql('DROP SCHEMA db_users');
+    }
 
+    private function saveOldPassword(): string
+    {
+        return
+            'CREATE OR REPLACE FUNCTION save_old_password()
+            RETURNS TRIGGER AS $$
+            BEGIN
+              IF OLD.password <> NEW.password THEN
+                NEW.old_password := OLD.password;
+            END IF;
+            RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;';
+    }
+
+    private function beforePasswordUpdate(): string
+    {
+        return
+            'CREATE TRIGGER before_password_update
+            BEFORE UPDATE OF password ON "db_users".users
+            FOR EACH ROW
+            EXECUTE FUNCTION save_old_password();';
     }
 }
