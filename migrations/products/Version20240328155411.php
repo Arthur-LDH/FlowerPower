@@ -43,12 +43,15 @@ final class Version20240328155411 extends AbstractMigration
         $this->addSql('ALTER TABLE db_products.pricingSeller ADD CONSTRAINT FK_DEC4E519EA698D8D FOREIGN KEY (productSeller_id) REFERENCES db_products.productSeller (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_products.productSellerImage ADD CONSTRAINT FK_B9CD2D626C8A81A9 FOREIGN KEY (products_id) REFERENCES db_products.productSeller (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_products.productSellerImage ADD CONSTRAINT FK_B9CD2D62D44F05E5 FOREIGN KEY (images_id) REFERENCES db_products.image (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql($this->checkStockLevel());
+        $this->addSql($this->stockManagement());
+        $this->addSql($this->isProductInSeason());
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SCHEMA public');
+        //$this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER TABLE CategoryErpProductSeller DROP CONSTRAINT FK_4C75B178EA698D8D');
         $this->addSql('ALTER TABLE db_products.pricingSeller DROP CONSTRAINT FK_DEC4E519EA698D8D');
         $this->addSql('ALTER TABLE db_products.productSellerImage DROP CONSTRAINT FK_B9CD2D626C8A81A9');
@@ -58,5 +61,51 @@ final class Version20240328155411 extends AbstractMigration
         $this->addSql('DROP TABLE db_products.pricingSeller');
         $this->addSql('DROP TABLE db_products.productSeller');
         $this->addSql('DROP TABLE db_products.productSellerImage');
+        $this->addSql('DROP SCHEMA db_products');
+    }
+
+
+    private function checkStockLevel()
+    {
+        Return 'CREATE OR REPLACE FUNCTION check_stock_level()
+                RETURNS TRIGGER AS $$
+                BEGIN
+                    IF NEW.stock_left < NEW.stock_min THEN
+                        -- Envoyer une notification au vendeur
+                        RAISE NOTICE \'Stock pour le produit % est en dessous du seuil minimum. Veuillez penser au réapprovisionnement.\', NEW.productseller_id;
+                    END IF;
+                    RETURN NEW;
+                END;
+                $$ LANGUAGE plpgsql;';
+    }
+
+    private function stockManagement()
+    {
+        Return 'CREATE TRIGGER stock_management
+                AFTER UPDATE OF stock_left ON "db_products".pricingseller
+                FOR EACH ROW
+                WHEN (OLD.stock_left >= OLD.stock_min AND NEW.stock_left < NEW.stock_min)
+                EXECUTE FUNCTION check_stock_level();';
+    }
+
+    private function isProductInSeason()
+    {
+        Return 'CREATE OR REPLACE FUNCTION is_product_in_season(product_id UUID)
+                RETURNS BOOLEAN AS $$
+                DECLARE
+                is_in_season BOOLEAN;
+                BEGIN
+
+                SELECT CURRENT_DATE BETWEEN seasonality_start AND seasonality_end INTO is_in_season
+                FROM "db_products".productseller
+                WHERE id = product_id;
+
+                IF is_in_season IS NULL THEN
+                        RETURN TRUE;
+                ELSE
+                        RETURN is_in_season;
+                END IF;
+                END;
+                $$ LANGUAGE plpgsql;';
     }
 }
