@@ -41,12 +41,14 @@ final class Version20240328155424 extends AbstractMigration
         $this->addSql('ALTER TABLE db_users.seller ADD CONSTRAINT FK_99EFCA3BF5B7AF75 FOREIGN KEY (address_id) REFERENCES db_users.address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_users.usersAddress ADD CONSTRAINT FK_AFD11D2A67B3B43D FOREIGN KEY (users_id) REFERENCES db_users.users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_users.usersAddress ADD CONSTRAINT FK_AFD11D2AF5B7AF75 FOREIGN KEY (address_id) REFERENCES db_users.address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $sql_users =file_get_contents('./src/sql/functions_users.sql');
+        $this->addSql($sql_users);
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SCHEMA public');
+        //$this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER TABLE db_users.seller DROP CONSTRAINT FK_99EFCA3B67B3B43D');
         $this->addSql('ALTER TABLE db_users.seller DROP CONSTRAINT FK_99EFCA3BF5B7AF75');
         $this->addSql('ALTER TABLE db_users.usersAddress DROP CONSTRAINT FK_AFD11D2A67B3B43D');
@@ -55,5 +57,7 @@ final class Version20240328155424 extends AbstractMigration
         $this->addSql('DROP TABLE db_users.seller');
         $this->addSql('DROP TABLE db_users.users');
         $this->addSql('DROP TABLE db_users.usersAddress');
+        $this->addSql('DROP SCHEMA db_users');
+
     }
 }

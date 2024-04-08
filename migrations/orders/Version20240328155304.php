@@ -34,16 +34,19 @@ final class Version20240328155304 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN db_orders.usersOrders.orders_id IS \'(DC2Type:uuid)\'');
         $this->addSql('ALTER TABLE db_orders.orderPricingSellerOrErp ADD CONSTRAINT FK_87FBC62FCFFE9AD6 FOREIGN KEY (orders_id) REFERENCES db_orders."order" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_orders.usersOrders ADD CONSTRAINT FK_EC4A0825CFFE9AD6 FOREIGN KEY (orders_id) REFERENCES db_orders."order" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $sql_orders =file_get_contents('./src/sql/functions_orders.sql');
+        $this->addSql($sql_orders);
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SCHEMA public');
+        //$this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER TABLE db_orders.orderPricingSellerOrErp DROP CONSTRAINT FK_87FBC62FCFFE9AD6');
         $this->addSql('ALTER TABLE db_orders.usersOrders DROP CONSTRAINT FK_EC4A0825CFFE9AD6');
         $this->addSql('DROP TABLE db_orders."order"');
         $this->addSql('DROP TABLE db_orders.orderPricingSellerOrErp');
         $this->addSql('DROP TABLE db_orders.usersOrders');
+        $this->addSql('DROP SCHEMA db_orders');
     }
 }

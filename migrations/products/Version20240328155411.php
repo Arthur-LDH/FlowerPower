@@ -43,12 +43,14 @@ final class Version20240328155411 extends AbstractMigration
         $this->addSql('ALTER TABLE db_products.pricingSeller ADD CONSTRAINT FK_DEC4E519EA698D8D FOREIGN KEY (productSeller_id) REFERENCES db_products.productSeller (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_products.productSellerImage ADD CONSTRAINT FK_B9CD2D626C8A81A9 FOREIGN KEY (products_id) REFERENCES db_products.productSeller (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE db_products.productSellerImage ADD CONSTRAINT FK_B9CD2D62D44F05E5 FOREIGN KEY (images_id) REFERENCES db_products.image (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $sql_products =file_get_contents('./src/sql/functions_products.sql');
+        $this->addSql($sql_products);
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE SCHEMA public');
+        //$this->addSql('CREATE SCHEMA public');
         $this->addSql('ALTER TABLE CategoryErpProductSeller DROP CONSTRAINT FK_4C75B178EA698D8D');
         $this->addSql('ALTER TABLE db_products.pricingSeller DROP CONSTRAINT FK_DEC4E519EA698D8D');
         $this->addSql('ALTER TABLE db_products.productSellerImage DROP CONSTRAINT FK_B9CD2D626C8A81A9');
@@ -58,5 +60,6 @@ final class Version20240328155411 extends AbstractMigration
         $this->addSql('DROP TABLE db_products.pricingSeller');
         $this->addSql('DROP TABLE db_products.productSeller');
         $this->addSql('DROP TABLE db_products.productSellerImage');
+        $this->addSql('DROP SCHEMA db_products');
     }
 }
