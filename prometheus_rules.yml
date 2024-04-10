@@ -1,0 +1,11 @@
+groups:
+    - name: Database Alert Rules
+      rules:
+          - alert: DatabaseDown
+            expr: up{job="postgresql-users"} == 0
+            for: 5m
+            labels:
+                severity: critical
+            annotations:
+                summary: "Database is down"
+                description: "The database has been down for more than 5 minutes."

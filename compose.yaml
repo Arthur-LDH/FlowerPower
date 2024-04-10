@@ -132,26 +132,6 @@ services:
       - "6379:6379"
     networks:
       - monitoring
-  
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
-    restart: unless-stopped
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    expose:
-      - 9100
-    ports:
-      - 9100:9100
-    networks:
-      - monitoring
 
   prometheus:
     image: prom/prometheus:latest
@@ -172,13 +152,78 @@ services:
       - 9090:9090
     networks:
       - monitoring
+  
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
+    ports:
+      - 9100:9100
+    networks:
+      - monitoring
       
-  pg_exporter:
+  pg_exporter_users:
     image: wrouesnel/postgres_exporter
     ports:
       - 9187:9187
     environment:
       DATA_SOURCE_NAME: postgresql://root:master@database-users:5432/db_users?sslmode=disable
+    networks:
+      - monitoring  
+  
+  pg_exporter_orders:
+    image: wrouesnel/postgres_exporter
+    ports:
+      - 9188:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://root:master@database-orders:5432/db_orders?sslmode=disable
+    networks:
+      - monitoring
+
+  pg_exporter_erp:
+    image: wrouesnel/postgres_exporter
+    ports:
+      - 9189:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://root:master@database-erp:5432/db_erp?sslmode=disable
+    networks:
+      - monitoring
+
+  pg_exporter_products:
+    image: wrouesnel/postgres_exporter
+    ports:
+      - 9190:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://root:master@database-products:5432/db_products?sslmode=disable
+    networks:
+      - monitoring
+
+  pg_exporter_reviews:
+    image: wrouesnel/postgres_exporter
+    ports:
+      - 9191:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://root:master@database-reviews:5432/db_reviews?sslmode=disable
+    networks:
+      - monitoring
+
+  pg_exporter_promotions:
+    image: wrouesnel/postgres_exporter
+    ports:
+      - 9192:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://root:master@database-promotions:5432/db_promotions?sslmode=disable
     networks:
       - monitoring
       
