@@ -38,6 +38,8 @@ services:
       - target: 443
         published: ${HTTP3_PORT:-443}
         protocol: udp
+    networks:
+      - monitoring
         
   database-users:
     image: postgres:latest
@@ -50,6 +52,8 @@ services:
       - ./docker/db/data/users:/var/lib/postgresql/data --clean
     ports:
       - "5432:5432"
+    networks:
+      - monitoring
 
   database-orders:
     image: postgres:latest
@@ -62,6 +66,8 @@ services:
       - ./docker/db/data/orders:/var/lib/postgresql/data --clean
     ports:
       - "5433:5432"
+    networks:
+      - monitoring
   
   database-erp:
     image: postgres:latest
@@ -74,6 +80,8 @@ services:
       - ./docker/db/data/erp:/var/lib/postgresql/data --clean
     ports:
       - "5434:5432"
+    networks:
+      - monitoring
 
   database-products:
     image: postgres:latest
@@ -86,6 +94,8 @@ services:
       - ./docker/db/data/products:/var/lib/postgresql/data --clean
     ports:
       - "5435:5432"
+    networks:
+      - monitoring
 
   database-reviews:
     image: postgres:latest
@@ -98,6 +108,8 @@ services:
       - ./docker/db/data/reviews:/var/lib/postgresql/data --clean
     ports:
       - "5436:5432"
+    networks:
+      - monitoring
 
   database-promotions:
     image: postgres:latest
@@ -110,12 +122,76 @@ services:
       - ./docker/db/data/promotions:/var/lib/postgresql/data --clean
     ports:
       - "5437:5432"
+    networks:
+      - monitoring
 
   database-basket:
     image: redis
     restart: unless-stopped
     ports:
       - "6379:6379"
+    networks:
+      - monitoring
+  
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    expose:
+      - 9100
+    ports:
+      - 9100:9100
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring
+      
+  pg_exporter:
+    image: wrouesnel/postgres_exporter
+    ports:
+      - 9187:9187
+    environment:
+      DATA_SOURCE_NAME: postgresql://root:master@database-users:5432/db_users?sslmode=disable
+    networks:
+      - monitoring
+      
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    networks:
+      - monitoring
+        
+networks:
+  monitoring:
+    driver: bridge
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
@@ -124,5 +200,6 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  prometheus_data: {}
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
